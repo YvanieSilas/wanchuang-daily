@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>万创日报</title>
+<style>
+:root {
+  --paper: #F5EFE4; --sheet: #FBF7EE; --sand: #E8E6DC;
+  --ink: #2A2622; --ink-light: #4A433C; --ink-muted: #6B6158;
+  --border: #D8CFBE; --accent: #537D96; --accent-deep: #1B365D;
+  --green: #4A6B4A; --danger: #8B2C1F; --ochre: #9D5F4D; --warm-gray: #8F867B;
+  --radius: 3px;
+  --font-serif: 'Georgia','Noto Serif SC','Songti SC',serif;
+  --font-sans: -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;
+}
+
+:root.theme-dark {
+  --paper: #0f1419; --sheet: #161b22; --sand: #1c2128;
+  --ink: #c9d1d9; --ink-light: #8b949e; --ink-muted: #6e7681;
+  --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff;
+  --green: #3fb950; --danger: #f85149; --ochre: #d29922; --warm-gray: #6e7681;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); padding:2rem 1.5rem 4rem; }
+.wrap { max-width:1100px; margin:0 auto; }
+
+.masthead { text-align:center; padding-bottom:1.5rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border); }
+.masthead .rule-top { border:none; border-top:2px solid var(--ink); width:60px; margin:0 auto 1rem; }
+.masthead h1 { font-family:var(--font-serif); font-size:2.2rem; font-weight:500; letter-spacing:.06em; }
+.masthead .dateline { font-family:var(--font-serif); font-size:.82rem; color:var(--ink-muted); margin-top:.4rem; letter-spacing:.04em; }
+.masthead .rule-bottom { border:none; border-top:.5px solid var(--border); width:100%; margin:.8rem auto 0; }
+
+.date-nav { display:flex; align-items:center; justify-content:center; gap:1.2rem; margin-bottom:1.5rem; font-family:var(--font-serif); }
+.date-nav button { background:none; border:.5px solid var(--border); border-radius:var(--radius); color:var(--ink-muted); font-family:var(--font-serif); font-size:.8rem; padding:4px 12px; cursor:pointer; }
+.date-nav button:hover { color:var(--accent); border-color:var(--accent); }
+.date-nav .cur { font-size:.9rem; font-weight:500; }
+
+.section-title { font-family:var(--font-serif); font-size:.95rem; font-weight:500; border-left:2px solid var(--accent); padding-left:10px; border-radius:0; margin-bottom:.8rem; }
+
+/* overview */
+.ov-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(216,207,190,0.5); border:.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
+.ov-cell { background:var(--sheet); padding:.9rem .7rem; text-align:center; }
+.ov-cell .ol { font-size:.65rem; color:var(--ink-muted); letter-spacing:.04em; }
+.ov-cell .ov { font-family:var(--font-serif); font-size:1.4rem; font-weight:500; color:var(--accent-deep); }
+.ov-cell .os { font-size:.65rem; color:var(--ink-muted); margin-top:.1rem; }
+
+/* metrics row */
+.mt-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:rgba(216,207,190,0.5); border:.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.8rem; }
+.mt-cell { background:var(--sheet); padding:.9rem .7rem; text-align:center; }
+.mt-cell .ml { font-size:.65rem; color:var(--ink-muted); letter-spacing:.04em; }
+.mt-cell .mv { font-family:var(--font-serif); font-size:1.4rem; font-weight:500; color:var(--accent); }
+.mt-cell.alert .mv { color:var(--danger); }
+
+/* dept accordion */
+.dept-list { display:flex; flex-direction:column; gap:1px; background:rgba(216,207,190,0.5); border:.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.8rem; }
+.dept-hdr { display:grid; grid-template-columns:1.6fr 1fr 1fr .8fr 1fr .9fr; padding:8px 12px; background:var(--sand); font-size:.7rem; font-weight:500; color:var(--ink-light); letter-spacing:.03em; }
+.dept-item { background:var(--sheet); cursor:pointer; user-select:none; }
+.dept-item:hover { background:#F2ECDE; }
+.theme-dark .dept-item:hover { background:rgba(88,166,255,.06); }
+.dept-item.expanded { background:rgba(83,125,150,.035); }
+.dept-main { display:grid; grid-template-columns:1.6fr 1fr 1fr .8fr 1fr .9fr; padding:10px 12px; align-items:center; font-size:.82rem; }
+.dept-name { display:flex; align-items:center; gap:6px; }
+.dept-name .chevron { font-size:.55rem; color:var(--ink-muted); transition:transform .25s; width:12px; text-align:center; }
+.dept-item.expanded .chevron { transform:rotate(90deg); }
+.dept-detail { max-height:0; overflow:hidden; transition:max-height .35s; }
+.dept-item.expanded .dept-detail { max-height:800px; }
+.m-row { display:grid; grid-template-columns:1.6fr 1fr 1fr .8fr 1fr .9fr; padding:7px 12px; font-size:.78rem; border-top:.5px solid rgba(0,0,0,.04); background:rgba(83,125,150,.02); align-items:center; }
+.m-name { padding-left:24px; color:var(--ink-light); }
+.m-rank { font-size:.72rem; color:var(--ink-muted); }
+
+.badge { display:inline-flex; padding:1px 7px; font-size:.68rem; font-weight:500; border-radius:var(--radius); white-space:nowrap; }
+.badge-ok { background:rgba(74,107,74,.1); color:var(--green); }
+.badge-warn { background:rgba(157,95,77,.1); color:var(--ochre); }
+.badge-danger { background:rgba(139,44,31,.1); color:var(--danger); }
+.badge-neutral { background:rgba(143,134,123,.1); color:var(--warm-gray); }
+.badge-info { background:#E4ECF5; color:var(--accent-deep); }
+
+.wechat-new-strip { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.8rem; font-size:.82rem; }
+.wechat-new-strip .wn-tag { background:var(--sheet); border:.5px solid rgba(157,95,77,.15); border-radius:var(--radius); padding:4px 10px; }
+
+.snap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:2rem; }
+.snap-card { background:var(--sheet); border:.5px solid var(--border); border-radius:var(--radius); padding:.8rem 1rem; }
+.snap-card .sl { font-size:.68rem; color:var(--ink-muted); margin-bottom:.2rem; }
+.snap-card .sv { font-size:.88rem; font-weight:500; }
+.snap-card.g .sv { color:var(--green); }
+.snap-card.r .sv { color:var(--danger); }
+
+.banner { background:var(--sheet); border:.5px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; margin-bottom:1.8rem; }
+.banner .b-top { display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center; margin-bottom:.8rem; }
+.banner .b-metric { min-width:80px; }
+.banner .b-metric .bl { font-size:.65rem; color:var(--ink-muted); letter-spacing:.04em; }
+.banner .b-metric .bv { font-family:var(--font-serif); font-size:1.5rem; font-weight:500; color:var(--accent); }
+.banner .b-metric.alert .bv { color:var(--danger); }
+.banner .b-divider { width:.5px; height:32px; background:var(--border); margin:0 4px; }
+.banner .b-top3 { font-size:.75rem; color:var(--ink-light); min-width:160px; }
+.banner .b-top3 span { color:var(--accent); font-weight:500; }
+.banner .b-trend { display:flex; align-items:flex-end; gap:6px; height:44px; }
+.banner .b-trend .bt-bar { flex:1; background:var(--border); border-radius:1px 1px 0 0; min-width:12px; }
+.banner .b-trend .bt-bar.today { background:var(--accent); }
+.banner .b-trend-labels { display:flex; gap:6px; font-size:.58rem; color:var(--ink-muted); margin-top:3px; }
+.banner .b-trend-labels span { flex:1; text-align:center; min-width:12px; }
+.bt-bar-wrap { flex:1; display:flex; gap:2px; align-items:flex-end; min-width:28px; position:relative; cursor:default; }
+.bt-bar-wrap:hover .bt-tip { display:block; }
+.bt-tip { display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; font-size:.65rem; padding:3px 7px; border-radius:3px; white-space:nowrap; z-index:10; pointer-events:none; }
+@media(max-width:700px) { .banner .b-divider { display:none; } }
+
+/* Sidebar */
+
+
+
+
+
+
+
+@media(max-width:900px) {  }
+
+.footer { text-align:center; padding-top:1.2rem; border-top:.5px solid var(--border); font-family:var(--font-serif); font-size:.72rem; color:var(--ink-muted); letter-spacing:.03em; }
+
+@media(max-width:700px) {
+  body { padding:1rem .6rem 2rem; }
+  .masthead h1 { font-size:1.6rem; }
+  .ov-grid { grid-template-columns:repeat(2,1fr); }
+  .mt-grid { grid-template-columns:repeat(3,1fr); }
+  .mt-cell:last-child { grid-column:span 3; }
+  .dept-hdr,.dept-main,.m-row { grid-template-columns:1.3fr .8fr .8fr .6fr 1fr .8fr; font-size:.73rem; }
+  .snap-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div style="position:absolute;top:2rem;left:2rem;font-size:.72rem;color:var(--ink-muted);cursor:pointer;user-select:none" id="themeToggle" title="切换浅色/深色主题">◐</div>
+  <hr class="rule-top"><h1>万 创 日 报</h1>
+  <p class="dateline" id="dateline"></p><hr class="rule-bottom">
+</header>
+
+<nav class="date-nav">
+  <button id="btnPrev">← 前一天</button>
+  <span class="cur" id="curDate"></span>
+  <button id="btnNext">后一天 →</button>
+</nav>
+
+<div class="section-title">全盘总览</div>
+<div class="ov-grid" id="ovGrid"></div>
+
+<div class="section-title">通话核心指标</div>
+<div class="mt-grid" id="mtGrid"></div>
+
+<!-- 通栏：TOP3 + 趋势 -->
+<div class="banner" id="banner"></div>
+
+<div class="section-title">电话 · 部门横向对比</div>
+<div class="dept-list">
+  <div class="dept-hdr"><span>部门</span><span>通话人数</span><span>人均通时</span><span>高意向</span><span>活跃项目</span><span>状态</span></div>
+  <div id="deptItems"></div>
+</div>
+
+<div class="section-title">今日微信新增好友</div>
+<div class="wechat-new-strip" id="wechatNewStrip"></div>
+
+<div class="section-title">微信 · 好友总量</div>
+<div class="dept-list">
+  <div class="dept-hdr" style="grid-template-columns:1.5fr 1fr 1fr .9fr"><span>部门</span><span>新增</span><span>好友总量</span><span>状态</span></div>
+  <div id="wechatItems"></div>
+</div>
+
+<div class="section-title">项目动态快照</div>
+<div class="snap-grid" id="snapGrid"></div>
+
+<footer class="footer">数据源：云客 · 万创投行内部日报系统 · <span id="ftDate"></span></footer>
+
+</div><!-- /wrap -->
+
+<script>
+var DATA = {"2026-07-31": {"date": "2026-07-31", "overview": {"totalDevices": 26, "totalCalls": 25, "totalCallCount": 271, "totalActivePeople": 15, "totalInvestors": null, "totalProjects": null, "totalWechatFriends": 1532, "totalDuration": 140, "highIntent": null, "anomalyDepts": 0, "activeProjects": null}, "verdict": {"level": "normal", "text": "7月31日整体正常。"}, "highlights": ["事业三部今日通话121通", "事业一部新增微信好友30人", "综合管理孟迪单日通话60分钟"], "departments": [{"name": "事业一部", "callCount": 3, "totalMembers": 10, "avgDuration": 5, "highIntent": null, "activeProjects": null, "status": "normal", "members": [{"name": "胡超", "calls": 58, "duration": 11, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "孙健明", "calls": 5, "duration": 2, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王珑龙", "calls": 3, "duration": 0, "highIntent": null, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "一部储备1", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "原洁", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "周同春1", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "李惠超", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "洪先亮", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "合伙人·未使用", "tagType": "neutral"}, {"name": "那吉康珠", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "合伙人·未使用", "tagType": "neutral"}, {"name": "周同春", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}]}, {"name": "事业二部", "callCount": 5, "totalMembers": 10, "avgDuration": 5, "highIntent": null, "activeProjects": null, "status": "normal", "members": [{"name": "郭双琪", "calls": 37, "duration": 14, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "杨博睿", "calls": 15, "duration": 4, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "朱长风", "calls": 7, "duration": 5, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "李江涛", "calls": 3, "duration": 1, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "易鹏", "calls": 3, "duration": 0, "highIntent": null, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "刘博", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "吴阿琪", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "刘钰轩", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "刘阳", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "朱贤敏", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}]}, {"name": "事业三部", "callCount": 5, "totalMembers": 10, "avgDuration": 8, "highIntent": null, "activeProjects": null, "status": "normal", "members": [{"name": "赵伟伟", "calls": 53, "duration": 6, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "庞嘉莉", "calls": 23, "duration": 19, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "周世玥", "calls": 22, "duration": 7, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王润清", "calls": 11, "duration": 3, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "金雨霏", "calls": 9, "duration": 4, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "薛卋甫", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "谭淏泽", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "王开岩", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}, {"name": "丁佳圆", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "合伙人·未使用", "tagType": "neutral"}, {"name": "杨云静", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "合伙人·未使用", "tagType": "neutral"}]}, {"name": "综合管理", "callCount": 2, "totalMembers": 3, "avgDuration": 31, "highIntent": null, "activeProjects": null, "status": "normal", "members": [{"name": "孟迪", "calls": 10, "duration": 60, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "刘轩", "calls": 3, "duration": 2, "highIntent": null, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "静鑫", "calls": 0, "duration": 0, "highIntent": null, "rank": "—", "tag": "今日未通话", "tagType": "neutral"}]}], "wechatDepts": [{"name": "事业一部", "newFriends": 30, "totalFriends": 977, "activeChats": null, "status": "normal", "members": [{"name": "周同春1", "newFriends": 0, "totalFriends": 493}, {"name": "胡超", "newFriends": 2, "totalFriends": 163}, {"name": "一部储备1", "newFriends": 5, "totalFriends": 151}, {"name": "原洁", "newFriends": 19, "totalFriends": 102}, {"name": "孙健明", "newFriends": 1, "totalFriends": 27}, {"name": "王珑龙", "newFriends": 3, "totalFriends": 24}, {"name": "李惠超", "newFriends": 0, "totalFriends": 17}, {"name": "洪先亮", "newFriends": 0, "totalFriends": 0}, {"name": "那吉康珠", "newFriends": 0, "totalFriends": 0}, {"name": "周同春", "newFriends": 0, "totalFriends": 0}]}, {"name": "事业二部", "newFriends": 4, "totalFriends": 390, "activeChats": null, "status": "normal", "members": [{"name": "郭双琪", "newFriends": 2, "totalFriends": 237}, {"name": "杨博睿", "newFriends": 2, "totalFriends": 55}, {"name": "刘博", "newFriends": 0, "totalFriends": 41}, {"name": "李江涛", "newFriends": 0, "totalFriends": 15}, {"name": "吴阿琪", "newFriends": 0, "totalFriends": 11}, {"name": "刘钰轩", "newFriends": 0, "totalFriends": 10}, {"name": "朱长风", "newFriends": 0, "totalFriends": 8}, {"name": "朱贤敏", "newFriends": 0, "totalFriends": 7}, {"name": "易鹏", "newFriends": 0, "totalFriends": 6}, {"name": "刘阳", "newFriends": 0, "totalFriends": 0}]}, {"name": "事业三部", "newFriends": 9, "totalFriends": 161, "activeChats": null, "status": "warn", "members": [{"name": "谭淏泽", "newFriends": 3, "totalFriends": 48}, {"name": "金雨霏", "newFriends": 6, "totalFriends": 36}, {"name": "赵伟伟", "newFriends": 0, "totalFriends": 31}, {"name": "周世玥", "newFriends": 0, "totalFriends": 19}, {"name": "庞嘉莉", "newFriends": 0, "totalFriends": 17}, {"name": "薛卋甫", "newFriends": 0, "totalFriends": 5}, {"name": "王润清", "newFriends": 0, "totalFriends": 3}, {"name": "王开岩", "newFriends": 0, "totalFriends": 2}, {"name": "丁佳圆", "newFriends": 0, "totalFriends": 0}, {"name": "杨云静", "newFriends": 0, "totalFriends": 0}]}, {"name": "综合管理", "newFriends": 0, "totalFriends": 4, "activeChats": null, "status": "nodata", "members": [{"name": "孟迪", "newFriends": 0, "totalFriends": 2}, {"name": "刘轩", "newFriends": 0, "totalFriends": 2}, {"name": "静鑫", "newFriends": 0, "totalFriends": 0}]}], "projects": {"newTodayDesc": "数据待接入", "majorProgressDesc": "数据待接入", "stalledDesc": "数据待接入"}}, "2026-08-03": {"date": "2026-08-03", "overview": {"totalDevices": 28, "totalCalls": 16, "totalCallCount": 175, "totalInvestors": 164, "totalProjects": null, "totalWechatFriends": 1571, "totalDuration": 86, "highIntent": 1, "anomalyDepts": 0, "activeProjects": null}, "verdict": {"level": "normal", "text": "2026-08-03 组织架构 28 人、28 台设备在线。 今日 175 通电话（有效 16 通）。 微信新增好友 22 人。"}, "highlights": ["组织架构 28 人、28 台设备在线", "今日 175 通电话（有效 16 通），22 人微信新增好友", "综合管理（招聘/行政）数据单独展示"], "departments": [{"name": "事业一部", "callCount": 3, "totalMembers": 7, "avgDuration": 10, "highIntent": 0, "activeProjects": null, "status": "normal", "members": [{"name": "一部储备1", "calls": 1, "duration": 0, "highIntent": 0, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "孙健明", "calls": 14, "duration": 22, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王珑龙", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "胡超", "calls": 51, "duration": 8, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "周同春1", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "原洁", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "李惠超", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}]}, {"name": "事业二部", "callCount": 5, "totalMembers": 9, "avgDuration": 5, "highIntent": 1, "activeProjects": null, "status": "normal", "members": [{"name": "杨博睿", "calls": 8, "duration": 2, "highIntent": 0, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "易鹏", "calls": 7, "duration": 6, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "吴阿琪", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "朱长风", "calls": 5, "duration": 11, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "刘博", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "刘钰轩", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "郭双琪", "calls": 17, "duration": 7, "highIntent": 1, "rank": "—", "tag": "高意向", "tagType": "info"}, {"name": "李江涛", "calls": 7, "duration": 2, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "朱贤敏", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}]}, {"name": "事业三部", "callCount": 4, "totalMembers": 8, "avgDuration": 5, "highIntent": 0, "activeProjects": null, "status": "normal", "members": [{"name": "周世玥", "calls": 20, "duration": 5, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "薛卋甫", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "赵伟伟", "calls": 24, "duration": 4, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "金雨霏", "calls": 15, "duration": 14, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王开岩", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "谭淏泽", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "庞嘉莉", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王润清", "calls": 6, "duration": 0, "highIntent": 0, "rank": "—", "tag": "偏低", "tagType": "warn"}]}], "wechatDepts": [{"name": "事业一部", "newFriends": 19, "totalFriends": 1010, "activeChats": null, "status": "normal", "members": [{"name": "一部储备1", "newFriends": 1, "totalFriends": 155}, {"name": "孙健明", "newFriends": 3, "totalFriends": 28}, {"name": "王珑龙", "newFriends": 0, "totalFriends": 24}, {"name": "胡超", "newFriends": 3, "totalFriends": 171}, {"name": "周同春1", "newFriends": 0, "totalFriends": 493}, {"name": "原洁", "newFriends": 12, "totalFriends": 122}, {"name": "李惠超", "newFriends": 0, "totalFriends": 17}]}, {"name": "事业二部", "newFriends": 2, "totalFriends": 397, "activeChats": null, "status": "normal", "members": [{"name": "杨博睿", "newFriends": 1, "totalFriends": 58}, {"name": "易鹏", "newFriends": 0, "totalFriends": 6}, {"name": "吴阿琪", "newFriends": 0, "totalFriends": 11}, {"name": "朱长风", "newFriends": 0, "totalFriends": 8}, {"name": "刘博", "newFriends": 0, "totalFriends": 44}, {"name": "刘钰轩", "newFriends": 0, "totalFriends": 10}, {"name": "郭双琪", "newFriends": 0, "totalFriends": 238}, {"name": "李江涛", "newFriends": 1, "totalFriends": 15}, {"name": "朱贤敏", "newFriends": 0, "totalFriends": 7}]}, {"name": "事业三部", "newFriends": 1, "totalFriends": 164, "activeChats": null, "status": "normal", "members": [{"name": "周世玥", "newFriends": 0, "totalFriends": 19}, {"name": "薛卋甫", "newFriends": 0, "totalFriends": 5}, {"name": "赵伟伟", "newFriends": 0, "totalFriends": 31}, {"name": "金雨霏", "newFriends": 0, "totalFriends": 36}, {"name": "王开岩", "newFriends": 0, "totalFriends": 2}, {"name": "谭淏泽", "newFriends": 1, "totalFriends": 51}, {"name": "庞嘉莉", "newFriends": 0, "totalFriends": 17}, {"name": "王润清", "newFriends": 0, "totalFriends": 3}]}], "projects": {"newTodayDesc": "数据待接入", "majorProgressDesc": "数据待接入", "stalledDesc": "数据待接入"}}, "2026-08-04": {"date": "2026-08-04", "overview": {"totalDevices": 28, "totalCalls": 7, "totalCallCount": 57, "totalInvestors": 53, "totalProjects": null, "totalWechatFriends": 1571, "totalDuration": 23, "highIntent": 0, "anomalyDepts": 0, "activeProjects": null}, "verdict": {"level": "normal", "text": "2026-08-04 组织架构 28 人、28 台设备在线。 今日 57 通电话（有效 7 通）。 微信新增好友 22 人。"}, "highlights": ["组织架构 28 人、28 台设备在线", "今日 57 通电话（有效 7 通），22 人微信新增好友", "综合管理（招聘/行政）数据单独展示"], "departments": [{"name": "事业一部", "callCount": 1, "totalMembers": 7, "avgDuration": 4, "highIntent": 0, "activeProjects": null, "status": "normal", "members": [{"name": "一部储备1", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "孙健明", "calls": 8, "duration": 4, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王珑龙", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "胡超", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "周同春1", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "原洁", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "李惠超", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}]}, {"name": "事业二部", "callCount": 2, "totalMembers": 9, "avgDuration": 0, "highIntent": 0, "activeProjects": null, "status": "normal", "members": [{"name": "杨博睿", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "易鹏", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "吴阿琪", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "朱长风", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "刘博", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "刘钰轩", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "郭双琪", "calls": 4, "duration": 1, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "李江涛", "calls": 5, "duration": 0, "highIntent": 0, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "朱贤敏", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}]}, {"name": "事业三部", "callCount": 3, "totalMembers": 8, "avgDuration": 5, "highIntent": 0, "activeProjects": null, "status": "normal", "members": [{"name": "周世玥", "calls": 29, "duration": 10, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "薛卋甫", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "赵伟伟", "calls": 2, "duration": 0, "highIntent": 0, "rank": "—", "tag": "偏低", "tagType": "warn"}, {"name": "金雨霏", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王开岩", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "谭淏泽", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "庞嘉莉", "calls": 0, "duration": 0, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}, {"name": "王润清", "calls": 9, "duration": 6, "highIntent": 0, "rank": "—", "tag": "正常", "tagType": "info"}]}], "wechatDepts": [{"name": "事业一部", "newFriends": 19, "totalFriends": 1010, "activeChats": null, "status": "normal", "members": [{"name": "一部储备1", "newFriends": 1, "totalFriends": 155}, {"name": "孙健明", "newFriends": 3, "totalFriends": 28}, {"name": "王珑龙", "newFriends": 0, "totalFriends": 24}, {"name": "胡超", "newFriends": 3, "totalFriends": 171}, {"name": "周同春1", "newFriends": 0, "totalFriends": 493}, {"name": "原洁", "newFriends": 12, "totalFriends": 122}, {"name": "李惠超", "newFriends": 0, "totalFriends": 17}]}, {"name": "事业二部", "newFriends": 2, "totalFriends": 397, "activeChats": null, "status": "normal", "members": [{"name": "杨博睿", "newFriends": 1, "totalFriends": 58}, {"name": "易鹏", "newFriends": 0, "totalFriends": 6}, {"name": "吴阿琪", "newFriends": 0, "totalFriends": 11}, {"name": "朱长风", "newFriends": 0, "totalFriends": 8}, {"name": "刘博", "newFriends": 0, "totalFriends": 44}, {"name": "刘钰轩", "newFriends": 0, "totalFriends": 10}, {"name": "郭双琪", "newFriends": 0, "totalFriends": 238}, {"name": "李江涛", "newFriends": 1, "totalFriends": 15}, {"name": "朱贤敏", "newFriends": 0, "totalFriends": 7}]}, {"name": "事业三部", "newFriends": 1, "totalFriends": 164, "activeChats": null, "status": "normal", "members": [{"name": "周世玥", "newFriends": 0, "totalFriends": 19}, {"name": "薛卋甫", "newFriends": 0, "totalFriends": 5}, {"name": "赵伟伟", "newFriends": 0, "totalFriends": 31}, {"name": "金雨霏", "newFriends": 0, "totalFriends": 36}, {"name": "王开岩", "newFriends": 0, "totalFriends": 2}, {"name": "谭淏泽", "newFriends": 1, "totalFriends": 51}, {"name": "庞嘉莉", "newFriends": 0, "totalFriends": 17}, {"name": "王润清", "newFriends": 0, "totalFriends": 3}]}], "projects": {"newTodayDesc": "数据待接入", "majorProgressDesc": "数据待接入", "stalledDesc": "数据待接入"}}};
+var DATES = Object.keys(DATA).sort(); var cur = DATES.length - 1;
+var cur = DATES.length - 1;
+
+function fmtVal(v,s) { return v!=null ? v+(s||'') : '—'; }
+function sBadge(s) {
+  var m = {normal:['badge-ok','正常'],danger:['badge-danger','低活跃'],warn:['badge-warn','待观察'],nodata:['badge-neutral','暂无数据'],admin:['badge-neutral','招聘行政']};
+  var x = m[s]||m.normal;
+  return '<span class="badge '+x[0]+'">'+x[1]+'</span>';
+}
+function tBadge(tag,type) {
+  var m = {info:'badge-info',warn:'badge-warn',danger:'badge-danger'};
+  return '<span class="badge '+(m[type]||'badge-info')+'">'+tag+'</span>';
+}
+
+function render(dateKey) {
+  var d = DATA[dateKey]; if(!d) return;
+  var parts = dateKey.split('-');
+  var wday = ['日','一','二','三','四','五','六'][new Date(+parts[0],+parts[1]-1,+parts[2]).getDay()];
+  var ds = parts[0]+' 年 '+parseInt(parts[1])+' 月 '+parseInt(parts[2])+' 日 · 星期'+wday;
+  document.getElementById('dateline').textContent = ds;
+  document.getElementById('curDate').textContent = ds;
+  document.getElementById('ftDate').textContent = dateKey;
+
+  var o = d.overview;
+  document.getElementById('ovGrid').innerHTML =
+    '<div class="ov-cell"><div class="ol">在用手机</div><div class="ov">'+(o.totalDevices||'—')+' 台</div></div>'+
+    '<div class="ov-cell"><div class="ol">今日通话</div><div class="ov">'+(o.totalCallCount||'—')+' 通</div></div>'+
+    '<div class="ov-cell"><div class="ol">沟通投资人</div><div class="ov">'+(o.totalInvestors!=null?o.totalInvestors+' 人':'—')+'</div></div>'+
+    '<div class="ov-cell"><div class="ol">微信好友总量</div><div class="ov">'+(o.totalWechatFriends!=null?o.totalWechatFriends.toLocaleString()+' 人':'—')+'</div></div>';
+
+  var ac = o.anomalyDepts>0?' alert':'';
+  document.getElementById('mtGrid').innerHTML =
+    '<div class="mt-cell"><div class="ml">有效通话 ≥1min</div><div class="mv">'+(o.totalCalls||'—')+' 通</div></div>'+
+    '<div class="mt-cell"><div class="ml">总通时</div><div class="mv">'+(o.totalDuration||0)+' min</div></div>'+
+    '<div class="mt-cell"><div class="ml">高意向客户</div><div class="mv">'+(o.highIntent!=null?o.highIntent+' 个':'—')+'</div></div>'+
+    '<div class="mt-cell'+ac+'"><div class="ml">异常预警</div><div class="mv">'+(o.anomalyDepts||0)+' 部门</div></div>'+
+    '<div class="mt-cell"><div class="ml">在推项目</div><div class="mv">'+(o.activeProjects!=null?o.activeProjects:'待接入')+'</div></div>';
+
+  // 通栏：TOP 3 + 近七天趋势
+  var allM = [];
+  (d.departments||[]).forEach(function(dd){
+    if(dd.status==='admin') return;
+    (dd.members||[]).forEach(function(m){ if(m.calls>0) allM.push({name:m.name,calls:m.calls}); });
+  });
+  allM.sort(function(a,b){return b.calls-a.calls;});
+  var bn = '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'+
+    '<div style="font-size:.72rem;color:var(--ink-muted);letter-spacing:.04em">今日 TOP 3</div>';
+  allM.slice(0,3).forEach(function(t,i){
+    bn += '<span style="font-size:.82rem"><span style="color:var(--ink-muted)">'+(i+1)+'. </span>'+t.name+' <span style="font-weight:500;color:var(--accent)">'+t.calls+' 通</span></span>';
+  });
+  if(allM.length===0) bn += '<span style="color:var(--ink-muted);font-size:.78rem">暂无</span>';
+  bn += '</div>';
+
+  // 生成最近 7 天的日期列表（补空）
+  var today = new Date();
+  var weekDates = [];
+  for(var i=6;i>=0;i--){ var dt=new Date(today); dt.setDate(dt.getDate()-i); weekDates.push(dt.toISOString().substr(0,10)); }
+  var deptsOrder = [];
+  (d.departments||[]).forEach(function(dd){ deptsOrder.push(dd.name); });
+  var deptColors = ['var(--accent)','#1B365D','#9D5F4D','var(--warm-gray)'];
+  var deptData = {};
+  deptsOrder.forEach(function(dn){ deptData[dn]=[]; });
+  weekDates.forEach(function(dk){
+    var dd = DATA[dk];
+    deptsOrder.forEach(function(dn){
+      var v = 0;
+      if(dd) { var dep = dd.departments.filter(function(x){return x.name===dn;})[0]; if(dep) v = (dep.members||[]).reduce(function(s,m){return s+(m.calls||0);},0); }
+      deptData[dn].push(v);
+    });
+  });
+  var maxAll = 1;
+  weekDates.forEach(function(dk,i){
+    var s = deptsOrder.reduce(function(a,dn){return a+deptData[dn][i];},0);
+    if(s>maxAll) maxAll=s;
+  });
+  bn += '<div style="margin-top:.8rem"><div class="b-trend" style="height:60px;gap:4px">';
+  weekDates.forEach(function(dk,i){
+    var daySum = deptsOrder.reduce(function(a,dn){return a+deptData[dn][i];},0);
+    bn += '<div class="bt-bar-wrap"><div class="bt-tip">'+(dk||'')+'<br>'+deptsOrder.map(function(dn,j){return dn+':'+deptData[dn][i]+'通';}).join(' · ')+'</div><div style="display:flex;gap:2px;align-items:flex-end;height:100%;flex:1">';
+    deptsOrder.forEach(function(dn,j){
+      var v = deptData[dn][i];
+      var h = Math.max(2, Math.round((v/maxAll)*56));
+      bn += '<div style="flex:1;height:'+h+'px;background:'+deptColors[j]+';opacity:'+(dk===dateKey?'1':'.35')+';border-radius:1px 1px 0 0"></div>';
+    });
+    bn += '</div></div>';
+  });
+  bn += '</div><div class="b-trend-labels">';
+  weekDates.forEach(function(dk){ bn += '<span>'+(dk||'').substr(5)+'</span>'; });
+  bn += '</div>';
+  // 图例
+  bn += '<div style="display:flex;gap:12px;font-size:.62rem;color:var(--ink-muted);margin-top:4px">';
+  deptsOrder.forEach(function(dn,j){ bn += '<span><span style="display:inline-block;width:8px;height:8px;background:'+deptColors[j]+';border-radius:2px;margin-right:3px;vertical-align:middle"></span>'+dn+'</span>'; });
+  bn += '</div></div>';
+  document.getElementById('banner').innerHTML = bn;
+
+  // Phone depts
+  var dh = '';
+  d.departments.forEach(function(dd,di){
+    var hm = dd.members && dd.members.length>0;
+    dh += '<div class="dept-item'+(hm?'':' no-members')+'" data-dept="'+di+'">'+
+      '<div class="dept-main">'+
+        '<div class="dept-name">'+(hm?'<span class="chevron">▶</span>':'<span style="width:12px;display:inline-block"></span>')+dd.name+'</div>'+
+        '<div>'+fmtVal(dd.callCount,' / '+dd.totalMembers)+'</div>'+
+        '<div>'+fmtVal(dd.avgDuration,' min')+'</div>'+
+        '<div>'+fmtVal(dd.highIntent)+'</div>'+
+        '<div>'+fmtVal(dd.activeProjects)+'</div>'+
+        '<div>'+sBadge(dd.status)+'</div>'+
+      '</div>';
+    if(hm) {
+      dh += '<div class="dept-detail">';
+      dd.members.forEach(function(m){
+        dh += '<div class="m-row"><div class="m-name">'+m.name+'</div><div>'+m.calls+'</div><div>'+m.duration+' min</div><div>'+fmtVal(m.highIntent)+'</div><div class="m-rank">'+m.rank+'</div><div>'+tBadge(m.tag,m.tagType)+'</div></div>';
+      });
+      dh += '</div>';
+    }
+    dh += '</div>';
+  });
+  document.getElementById('deptItems').innerHTML = dh;
+
+  // WeChat new friends strip
+  var wn = '', wds = d.wechatDepts||[];
+  wds.forEach(function(wd){ if(wd.newFriends>0) wn += '<span class="wn-tag">'+wd.name+' <strong style="color:var(--ochre)">+'+wd.newFriends+'</strong></span>'; });
+  document.getElementById('wechatNewStrip').innerHTML = wn || '<span style="color:var(--ink-muted);font-size:.82rem">今日无新增</span>';
+
+  // WeChat depts
+  var wh = '';
+  wds.forEach(function(wd,wi){
+    var hm = wd.members && wd.members.length>0;
+    wh += '<div class="dept-item'+(hm?'':' no-members')+'">'+
+      '<div class="dept-main" style="grid-template-columns:1.5fr 1fr 1fr .9fr">'+
+        '<div class="dept-name">'+(hm?'<span class="chevron">▶</span>':'<span style="width:12px;display:inline-block"></span>')+wd.name+'</div>'+
+        '<div>+'+wd.newFriends+'</div><div>'+fmtVal(wd.totalFriends!=null?wd.totalFriends.toLocaleString():null)+'</div><div>'+sBadge(wd.status)+'</div>'+
+      '</div>';
+    if(hm){
+      wh += '<div class="dept-detail">';
+      wd.members.forEach(function(m){
+        wh += '<div class="m-row" style="grid-template-columns:1.5fr 1fr 1fr"><div class="m-name">'+m.name+'</div><div>+'+m.newFriends+'</div><div>'+fmtVal(m.totalFriends!=null?m.totalFriends.toLocaleString():null)+'</div></div>';
+      });
+      wh += '</div>';
+    }
+    wh += '</div>';
+  });
+  document.getElementById('wechatItems').innerHTML = wh;
+
+  // Projects
+  var p = d.projects;
+  document.getElementById('snapGrid').innerHTML =
+    '<div class="snap-card"><div class="sl">今日新增</div><div class="sv">'+p.newTodayDesc+'</div></div>'+
+    '<div class="snap-card g"><div class="sl">重大进展</div><div class="sv">'+p.majorProgressDesc+'</div></div>'+
+    '<div class="snap-card r"><div class="sl">卡壳预警</div><div class="sv">'+p.stalledDesc+'</div></div>';
+
+  
+    '<div class="snap-card"><div class="sl">今日新增</div><div class="sv">'+p.newTodayDesc+'</div></div>'+
+    '<div class="snap-card g"><div class="sl">重大进展</div><div class="sv">'+p.majorProgressDesc+'</div></div>'+
+    '<div class="snap-card r"><div class="sl">卡壳预警</div><div class="sv">'+p.stalledDesc+'</div></div>';
+
+  // Nav
+  document.getElementById('btnPrev').style.opacity = cur<=0?'0.3':'1';
+  document.getElementById('btnNext').style.opacity = cur>=DATES.length-1?'0.3':'1';
+
+  // Toggle
+  document.querySelectorAll('.dept-item').forEach(function(el){
+    if(el.classList.contains('no-members')) return;
+    el.onclick = function(e){ if(!e.target.closest('.badge')) this.classList.toggle('expanded'); };
+  });
+}
+
+document.getElementById('btnPrev').onclick = function(){ if(cur>0){cur--;render(DATES[cur]);} };
+document.getElementById('btnNext').onclick = function(){ if(cur<DATES.length-1){cur++;render(DATES[cur]);} };
+document.onkeydown = function(e){
+  if(e.key==='ArrowLeft'&&cur>0){cur--;render(DATES[cur]);}
+  if(e.key==='ArrowRight'&&cur<DATES.length-1){cur++;render(DATES[cur]);}
+};
+
+render(DATES[cur]);
+
+// 主题切换
+(function(){
+  var btn = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('daily-report-theme');
+  if (saved === 'dark') { document.documentElement.classList.add('theme-dark'); btn.textContent = '◑'; }
+  btn.onclick = function(){
+    var isDark = document.documentElement.classList.toggle('theme-dark');
+    btn.textContent = isDark ? '◑' : '◐';
+    localStorage.setItem('daily-report-theme', isDark ? 'dark' : 'light');
+  };
+})();
+</script>
+</body>
+</html>
