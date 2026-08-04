@@ -133,8 +133,8 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 
 <header class="masthead">
   <div style="position:absolute;top:2rem;left:2rem;font-size:.65rem;color:var(--ink-muted);user-select:none;display:flex;gap:10px;align-items:center">
-    <span id="updateTime"></span>
     <span id="themeToggle" style="cursor:pointer;font-size:.78rem" title="切换浅色/深色主题">◐</span>
+    <span id="updateTime"></span>
   </div>
   <hr class="rule-top"><h1>万 创 日 报</h1>
   <p class="dateline" id="dateline"></p><hr class="rule-bottom">
@@ -201,7 +201,8 @@ function render(dateKey) {
   document.getElementById('dateline').textContent = ds;
   document.getElementById('curDate').textContent = ds;
   document.getElementById('ftDate').textContent = dateKey;
-  document.getElementById('updateTime').textContent = '更新 ' + (d._updated || dateKey);
+  var ut = d._updated || (dateKey + ' ' + new Date().toTimeString().substr(0,5));
+  document.getElementById('updateTime').textContent = '更新 ' + ut;
 
   var o = d.overview;
   document.getElementById('ovGrid').innerHTML =
