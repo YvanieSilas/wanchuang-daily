@@ -380,6 +380,7 @@ render(DATES[cur]);
   <div id="noticeList" style="overflow-y:auto;height:calc(100% - 46px);padding:10px 14px;font-size:.8rem"></div>
 </div>
 
+<script src="./notices.js"></script>
 <script>
 // 公告系统
 (function(){
@@ -405,7 +406,7 @@ render(DATES[cur]);
       if(!read) hasUnread = true;
       list.innerHTML += '<div style="border-left:2px solid '+(read?'var(--border)':'var(--accent)')+';padding:6px 10px;margin-bottom:8px;background:var(--bg);border-radius:0 3px 3px 0">'+
         '<div style="font-size:.68rem;color:var(--ink-muted);margin-bottom:2px">'+n.time+' · '+n.author+'</div>'+
-        '<div style="color:var(--ink)">'+n.text+'</div>'+
+        '<div style="color:var(--ink);white-space:pre-line">'+n.text+'</div>'+
         '</div>';
     });
     dot.style.display = hasUnread ? 'block' : 'none';
