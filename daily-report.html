@@ -226,7 +226,7 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 
 <div class="section-title">微信 · 好友总量</div>
 <div class="dept-list">
-  <div class="dept-hdr" style="grid-template-columns:1.5fr .8fr .8fr 1fr .8fr"><span>部门</span><span>今日新增</span><span>状态</span><span>好友总量</span><span id="monthIncLabel">本月增量</span></div>
+  <div class="dept-hdr" style="grid-template-columns:1.5fr 1fr 1fr .8fr"><span>部门</span><span>新增</span><span>好友总量</span><span>状态</span></div>
   <div id="wechatItems"></div>
 </div>
 
@@ -424,21 +424,17 @@ function render(dateKey) {
 
   // WeChat depts
   var wh = '';
-  var monthLabel = (d.date||'').slice(5,7).replace(/^0/,'') + '月增量';
-  var lblEl = document.getElementById('monthIncLabel');
-  if (lblEl) lblEl.textContent = monthLabel;
   wds.forEach(function(wd,wi){
     var hm = wd.members && wd.members.length>0;
-    var deptMonth = wd.members ? wd.members.reduce(function(s,m){return s+(m.monthNew||0);},0) : 0;
     wh += '<div class="dept-item'+(hm?'':' no-members')+'">'+
-      '<div class="dept-main" style="grid-template-columns:1.5fr .8fr .8fr 1fr .8fr">'+
+      '<div class="dept-main" style="grid-template-columns:1.5fr 1fr 1fr .8fr">'+
         '<div class="dept-name">'+(hm?'<span class="chevron">▶</span>':'<span style="width:12px;display:inline-block"></span>')+wd.name+'</div>'+
-        '<div>+'+wd.newFriends+'</div><div></div><div>'+fmtVal(wd.totalFriends!=null?wd.totalFriends.toLocaleString():null)+'</div><div>+'+deptMonth+'</div>'+
+        '<div>+'+wd.newFriends+'</div><div>'+fmtVal(wd.totalFriends!=null?wd.totalFriends.toLocaleString():null)+'</div><div></div>'+
       '</div>';
     if(hm){
       wh += '<div class="dept-detail">';
       wd.members.forEach(function(m){
-        wh += '<div class="m-row" style="grid-template-columns:1.5fr .8fr .8fr 1fr .8fr"><div class="m-name">'+m.name+'</div><div>+'+m.newFriends+'</div><div>'+(m.status?('<span class="badge badge-'+(m.status==="优秀"?'great':(m.status==="偏低"?'warn':'info'))+'">'+m.status+'</span>'):'')+'</div><div>'+fmtVal(m.totalFriends!=null?m.totalFriends.toLocaleString():null)+'</div><div>+'+(m.monthNew||0)+'</div></div>';
+        wh += '<div class="m-row" style="grid-template-columns:1.5fr 1fr 1fr .8fr"><div class="m-name">'+m.name+'</div><div>+'+m.newFriends+'</div><div>'+fmtVal(m.totalFriends!=null?m.totalFriends.toLocaleString():null)+'</div><div>'+(m.status?('<span class="badge badge-'+(m.status==="优秀"?'great':(m.status==="偏低"?'warn':'info'))+'">'+m.status+'</span>'):'')+'</div></div>';
       });
       wh += '</div>';
     }
