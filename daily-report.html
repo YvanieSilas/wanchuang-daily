@@ -7,8 +7,8 @@
 <style>
 :root {
   --paper: #F5EFE4; --sheet: #FBF7EE; --sand: #E8E6DC;
-  --ink: #2A2622; --ink-light: #4A433C; --ink-muted: #6B6158;
-  --border: #D8CFBE; --accent: #537D96; --accent-deep: #1B365D;
+  --ink: #2A2622; --ink-light: #4A433C; --ink-muted: #6B6158; --ink-faint: #C9C1B2;
+  --border: #D8CFBE; --accent: #537D96; --accent-deep: #1B365D; --accent-light: rgba(83,125,150,.08);
   --green: #4A6B4A; --danger: #8B2C1F; --ochre: #9D5F4D; --warm-gray: #8F867B;
   --radius: 3px;
   --font-serif: 'Georgia','Noto Serif SC','Songti SC',serif;
@@ -17,8 +17,8 @@
 
 :root.theme-dark {
   --paper: #0f1419; --sheet: #161b22; --sand: #1c2128;
-  --ink: #c9d1d9; --ink-light: #8b949e; --ink-muted: #6e7681;
-  --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff;
+  --ink: #c9d1d9; --ink-light: #8b949e; --ink-muted: #6e7681; --ink-faint: #484f58;
+  --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff; --accent-light: rgba(88,166,255,.1);
   --green: #3fb950; --danger: #f85149; --ochre: #d29922; --warm-gray: #6e7681;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -31,10 +31,41 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 .masthead .dateline { font-family:var(--font-serif); font-size:.82rem; color:var(--ink-muted); margin-top:.4rem; letter-spacing:.04em; }
 .masthead .rule-bottom { border:none; border-top:.5px solid var(--border); width:100%; margin:.8rem auto 0; }
 
-.date-nav { display:flex; align-items:center; justify-content:center; gap:1.2rem; margin-bottom:1.5rem; font-family:var(--font-serif); }
+.date-nav { display:flex; align-items:center; justify-content:center; gap:1.2rem; margin-bottom:.9rem; font-family:var(--font-serif); }
 .date-nav button { background:none; border:.5px solid var(--border); border-radius:var(--radius); color:var(--ink-muted); font-family:var(--font-serif); font-size:.8rem; padding:4px 12px; cursor:pointer; }
 .date-nav button:hover { color:var(--accent); border-color:var(--accent); }
-.date-nav .cur { font-size:.9rem; font-weight:500; }
+.date-nav .cur { font-size:.9rem; font-weight:500; cursor:pointer; border-bottom:.5px dotted var(--ink-muted); }
+.date-nav .cur:hover { color:var(--accent); border-color:var(--accent); }
+
+/* 月历横条 */
+.month-strip { display:flex; align-items:center; justify-content:center; gap:3px; margin-bottom:1.6rem; }
+.month-strip .ms-arrow { color:var(--ink-muted); cursor:pointer; font-size:.9rem; padding:0 6px; user-select:none; }
+.month-strip .ms-arrow:hover { color:var(--accent); }
+.month-strip .ms-label { font-family:var(--font-serif); font-size:.78rem; color:var(--ink-muted); margin-right:6px; letter-spacing:.04em; }
+.month-strip .ms-day { width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:.7rem; border-radius:3px; color:var(--ink-faint); }
+.month-strip .ms-day.has { color:var(--accent); border:.5px solid var(--border); cursor:pointer; }
+.month-strip .ms-day.has:hover { border-color:var(--accent); }
+.month-strip .ms-day.sel { background:var(--accent); color:var(--sheet); font-weight:500; border-color:var(--accent); }
+.month-strip .ms-day.today { box-shadow:inset 0 0 0 1px var(--ochre); }
+@media(max-width:760px){ .month-strip { flex-wrap:wrap; gap:2px; } }
+
+/* 浮层月历 */
+.cal-pop { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--sheet); border:1px solid var(--border); border-radius:8px; padding:14px 16px; z-index:99; display:none; }
+.cal-pop.open { display:block; }
+.cal-pop .cp-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; gap:10px; }
+.cal-pop .cp-title { font-family:var(--font-serif); font-size:.9rem; font-weight:500; }
+.cal-pop .cp-arrow { color:var(--ink-muted); cursor:pointer; font-size:.85rem; padding:0 4px; }
+.cal-pop .cp-arrow:hover { color:var(--accent); }
+.cal-pop table { border-collapse:collapse; }
+.cal-pop th { font-size:.65rem; color:var(--ink-muted); font-weight:400; padding:3px 0; }
+.cal-pop td { width:30px; height:30px; text-align:center; font-size:.75rem; border-radius:3px; }
+.cal-pop td.cp-day { color:var(--ink-faint); }
+.cal-pop td.cp-has { color:var(--accent); cursor:pointer; }
+.cal-pop td.cp-has:hover { background:var(--accent-light); }
+.cal-pop td.cp-sel { background:var(--accent); color:var(--sheet); font-weight:500; }
+.cal-pop td.cp-today { box-shadow:inset 0 0 0 1px var(--ochre); }
+.cal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.18); z-index:98; display:none; }
+.cal-backdrop.open { display:block; }
 
 .section-title { font-family:var(--font-serif); font-size:.95rem; font-weight:500; border-left:2px solid var(--accent); padding-left:10px; border-radius:0; margin-bottom:.8rem; }
 
@@ -163,6 +194,11 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
   <span class="cur" id="curDate"></span>
   <button id="btnNext">后一天 →</button>
 </nav>
+
+<div class="month-strip" id="monthStrip"></div>
+
+<div class="cal-backdrop" id="calBackdrop"></div>
+<div class="cal-pop" id="calPop"></div>
 
 <div class="section-title">全盘总览</div>
 <div class="ov-grid" id="ovGrid"></div>
@@ -488,6 +524,9 @@ function render(dateKey) {
   document.getElementById('btnPrev').style.opacity = cur<=0?'0.3':'1';
   document.getElementById('btnNext').style.opacity = cur>=DATES.length-1?'0.3':'1';
 
+  // 月历横条
+  renderMonthStrip(dateKey);
+
   // Toggle
   document.querySelectorAll('.dept-item').forEach(function(el){
     if(el.classList.contains('no-members')) return;
@@ -497,6 +536,109 @@ function render(dateKey) {
 
 document.getElementById('btnPrev').onclick = function(){ if(cur>0){cur--;render(DATES[cur]);} };
 document.getElementById('btnNext').onclick = function(){ if(cur<DATES.length-1){cur++;render(DATES[cur]);} };
+
+// ===== 月历横条 + 浮层月历 =====
+var stripYear = null, stripMonth = null;  // 横条当前展示的年月
+var popYear = null, popMonth = null;      // 浮层当前展示的年月
+
+function fmtDay(y,m,d){ return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+
+function renderMonthStrip(dateKey){
+  var parts = dateKey.split('-');
+  var y = +parts[0], m = +parts[1], dd = +parts[2];
+  stripYear = y; stripMonth = m;
+  var daysInMonth = new Date(y, m, 0).getDate();
+  var todayStr = new Date();
+  var todayKey = todayStr.getFullYear()+'-'+String(todayStr.getMonth()+1).padStart(2,'0')+'-'+String(todayStr.getDate()).padStart(2,'0');
+  var html = '<span class="ms-arrow" onclick="shiftStrip(-1)">‹</span>';
+  html += '<span class="ms-label">'+m+'月</span>';
+  for(var d=1; d<=daysInMonth; d++){
+    var k = fmtDay(y,m,d);
+    var has = DATA[k] !== undefined;
+    var cls = 'ms-day' + (has?' has':'') + (k===dateKey?' sel':'') + (k===todayKey?' today':'');
+    var act = has ? ' onclick="jumpTo(\''+k+'\')"' : '';
+    html += '<span class="'+cls+'"'+act+'>'+d+'</span>';
+  }
+  html += '<span class="ms-arrow" onclick="shiftStrip(1)">›</span>';
+  document.getElementById('monthStrip').innerHTML = html;
+}
+
+function shiftStrip(dir){
+  stripMonth += dir;
+  if(stripMonth < 1){ stripMonth = 12; stripYear--; }
+  if(stripMonth > 12){ stripMonth = 1; stripYear++; }
+  // 跳到该月第一个有数据的日
+  var target = null;
+  for(var d=1; d<=31; d++){
+    var k = fmtDay(stripYear, stripMonth, d);
+    if(DATA[k] !== undefined){ target = k; break; }
+  }
+  if(target){ jumpTo(target); }
+  else { renderMonthStrip(fmtDay(stripYear, stripMonth, 1)); }
+}
+
+function jumpTo(dateKey){
+  var idx = DATES.indexOf(dateKey);
+  if(idx >= 0){ cur = idx; render(DATES[cur]); }
+}
+
+function renderCalPop(){
+  var y = popYear, m = popMonth;
+  var firstW = new Date(y, m-1, 1).getDay(); // 0=周日
+  var daysInMonth = new Date(y, m, 0).getDate();
+  var todayKey = new Date();
+  todayKey = todayKey.getFullYear()+'-'+String(todayKey.getMonth()+1).padStart(2,'0')+'-'+String(todayKey.getDate()).padStart(2,'0');
+  var curKey = DATES[cur];
+  var html = '<div class="cp-hd">'+
+    '<span class="cp-arrow" onclick="shiftPop(-1)">‹</span>'+
+    '<span class="cp-title">'+y+' 年 '+m+' 月</span>'+
+    '<span class="cp-arrow" onclick="shiftPop(1)">›</span>'+
+    '<span class="cp-arrow" style="color:var(--ink-muted)" onclick="closePop()">✕</span>'+
+    '</div>';
+  html += '<table><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr>';
+  var day = 1, done = false;
+  for(var w=0; w<6 && !done; w++){
+    html += '<tr>';
+    for(var i=0; i<7; i++){
+      if((w===0 && i<firstW) || day>daysInMonth){
+        html += '<td></td>';
+      } else {
+        var k = fmtDay(y,m,day);
+        var has = DATA[k] !== undefined;
+        var cls = has? 'cp-has':'cp-day';
+        if(k===curKey) cls += ' cp-sel';
+        if(k===todayKey) cls += ' cp-today';
+        var act = has? ' onclick="jumpTo(\''+k+'\');closePop();"' : '';
+        html += '<td class="'+cls+'"'+act+'>'+day+'</td>';
+        day++;
+        if(day>daysInMonth){ done = true; }
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  document.getElementById('calPop').innerHTML = html;
+}
+
+function openPop(){
+  popYear = +DATES[cur].split('-')[0];
+  popMonth = +DATES[cur].split('-')[1];
+  document.getElementById('calBackdrop').classList.add('open');
+  document.getElementById('calPop').classList.add('open');
+  renderCalPop();
+}
+function closePop(){
+  document.getElementById('calBackdrop').classList.remove('open');
+  document.getElementById('calPop').classList.remove('open');
+}
+function shiftPop(dir){
+  popMonth += dir;
+  if(popMonth < 1){ popMonth = 12; popYear--; }
+  if(popMonth > 12){ popMonth = 1; popYear++; }
+  renderCalPop();
+}
+document.getElementById('curDate').onclick = openPop;
+document.getElementById('calBackdrop').onclick = closePop;
 document.onkeydown = function(e){
   if(e.key==='ArrowLeft'&&cur>0){cur--;render(DATES[cur]);}
   if(e.key==='ArrowRight'&&cur<DATES.length-1){cur++;render(DATES[cur]);}
