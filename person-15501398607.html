@@ -123,12 +123,13 @@ function drawLine(containerId, values, baseline, opts){
   el.innerHTML = svg;
 }
 function drawCap(){
-  var labels = P.monthErshai.map(function(m){ return m[0].replace('2026/',''); });
+  var labels = P.monthErshai.map(function(m){ return parseInt(m[0].split('/')[1])+'月'; });
   var ershai = P.monthErshai.map(function(m){ return m[1]; });
   var roadshow = P.monthRoadshow.map(function(m){ return m[1]; });
-  // 当月二筛追加到折线
+  // 当月二筛追加到折线（当前月 + 1）
   if (P.curErshai !== undefined && P.curErshai !== null) {
-    var curLabel = '8月';
+    var now = new Date();
+    var curLabel = (now.getMonth()+1)+'月';
     var lastLabel = labels.length ? labels[labels.length-1] : '';
     if (!lastLabel || (lastLabel !== curLabel)) {
       labels.push(curLabel); ershai.push(P.curErshai); roadshow.push(null);
