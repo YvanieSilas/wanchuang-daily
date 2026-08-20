@@ -55,6 +55,7 @@ svg { width:100%; height:auto; display:block; }
     <div class="k"><div class="kl">本月目标</div><div class="kv">200</div></div>
     <div class="k"><div class="kl">今日通话</div><div class="kv">0 通</div></div>
     <div class="k"><div class="kl">今日加友</div><div class="kv">+0</div></div>
+    <div class="k"><div class="kl">当月二筛</div><div class="kv">23</div></div>
   </div>
   <div class="sec-title">好友总量 · 全量趋势</div>
   <div class="chart-card">
@@ -66,9 +67,14 @@ svg { width:100%; height:auto; display:block; }
     <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>通话数</span></div>
     <div id="chartCalls"></div>
   </div>
+  <div class="sec-title">产能 · 提交二筛与路演</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>提交二筛（折线）</span><span><span class="dot" style="background:var(--ochre)"></span>路演数（柱）</span></div>
+    <div id="chartCap"></div>
+  </div>
 </div>
 <script>
-var P = {"name": "朱长风", "dept": "事业二部", "deptLink": "dept-2.html", "dates": ["2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20"], "friends": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 13, 13, 13, 19, 22, 27, 27], "baseline": [200.0, 19.4, 25.8, 32.3, 38.7, 45.2, 58.1, 64.5, 71.0, 77.4, 83.9, 90.3, 96.8, 103.2, 109.7, 116.1, 122.6, 129.0], "calls": [7, 5, 4, 41, 36, 25, 0, 26, 22, 22, 19, 30, 0, 2, 20, 32, 15, 0], "newFriends": [0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 5, 0, 0, 6, 3, 5, 0], "status": "严重偏低", "goal": 200, "totalFriends": 27};
+var P = {"name": "朱长风", "dept": "事业二部", "deptLink": "dept-2.html", "dates": ["2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20"], "friends": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 13, 13, 13, 19, 22, 27, 27], "baseline": [200.0, 19.4, 25.8, 32.3, 38.7, 45.2, 58.1, 64.5, 71.0, 77.4, 83.9, 90.3, 96.8, 103.2, 109.7, 116.1, 122.6, 129.0], "calls": [7, 5, 4, 41, 36, 25, 0, 26, 22, 22, 19, 30, 0, 2, 20, 32, 15, 0], "newFriends": [0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 5, 0, 0, 6, 3, 5, 0], "status": "严重偏低", "goal": 200, "totalFriends": 27, "monthErshai": [["2026/01", 14], ["2026/02", 3], ["2026/03", 18], ["2026/04", 22], ["2026/05", 24], ["2026/06", 59], ["2026/07", 32]], "monthRoadshow": [["2026/01", 3], ["2026/02", 1], ["2026/03", 3], ["2026/04", 6], ["2026/05", 6], ["2026/06", 6], ["2026/07", 18]], "curErshai": 23};
 var W = 0;
 function drawLine(containerId, values, baseline, opts){
   var el = document.getElementById(containerId);
@@ -116,9 +122,57 @@ function drawLine(containerId, values, baseline, opts){
   svg += '</svg>';
   el.innerHTML = svg;
 }
+function drawCap(){
+  var labels = P.monthErshai.map(function(m){ return m[0].replace('2026/',''); });
+  var ershai = P.monthErshai.map(function(m){ return m[1]; });
+  var roadshow = P.monthRoadshow.map(function(m){ return m[1]; });
+  // 当月二筛追加到折线
+  if (P.curErshai !== undefined && P.curErshai !== null) {
+    var curLabel = '8月';
+    var lastLabel = labels.length ? labels[labels.length-1] : '';
+    if (!lastLabel || (lastLabel !== curLabel)) {
+      labels.push(curLabel); ershai.push(P.curErshai); roadshow.push(null);
+    }
+  }
+  if (!labels.length) { document.getElementById('chartCap').innerHTML = '<div style="color:var(--ink-muted);font-size:.75rem">暂无产能数据</div>'; return; }
+  var el = document.getElementById('chartCap');
+  var W = el.clientWidth || 720, H = 200, padL = 36, padR = 12, padT = 14, padB = 26;
+  var n = labels.length;
+  var maxV = 1;
+  ershai.forEach(function(v){ if(v>maxV) maxV=v; });
+  roadshow.forEach(function(v){ if(v!=null && v>maxV) maxV=v; });
+  var minV = 0, range = maxV - minV || 1;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var x = function(i){ return padL + (n===1 ? iw/2 : iw*i/(n-1)); };
+  var y = function(v){ return padT + ih * (1 - (v - minV) / range); };
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  for(var g=0; g<=4; g++){
+    var gy = padT + ih*g/4, gv = maxV - range*g/4;
+    svg += '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width=".5"/>';
+    svg += '<text x="'+(padL-6)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="var(--ink-muted)">'+Math.round(gv)+'</text>';
+  }
+  var bw = Math.min(22, iw/n*0.4);
+  for(var i=0; i<n; i++){
+    svg += '<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)">'+labels[i]+'</text>';
+    if (roadshow[i] != null) {
+      var bh = (roadshow[i]/maxV)*ih;
+      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="rgba(157,95,77,.45)" rx="1"><title>'+labels[i]+' 路演 '+roadshow[i]+'</title></rect>';
+    }
+  }
+  var lp = '';
+  for(var i=0; i<n; i++) lp += (i?' L':'M')+x(i).toFixed(1)+' '+y(ershai[i]).toFixed(1);
+  svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+  var showDot = n <= 40;
+  for(var i=0; i<n; i++){
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"><title>'+labels[i]+' 二筛 '+ershai[i]+'</title></circle>';
+  }
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
 function draw(){
   drawLine('chartFriends', P.friends, P.baseline, null);
   drawLine('chartCalls', P.calls, null, {min:0});
+  drawCap();
 }
 window.addEventListener('resize', draw);
 draw();
