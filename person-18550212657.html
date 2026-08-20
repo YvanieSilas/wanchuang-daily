@@ -39,6 +39,8 @@ a:hover { color:var(--accent-deep); }
 .legend { display:flex; gap:14px; font-size:.66rem; color:var(--ink-muted); margin-bottom:4px; }
 .legend .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
 svg { width:100%; height:auto; display:block; }
+.chart-box { position:relative; }
+.ctip { position:absolute; display:none; background:var(--ink); color:#fff; font-size:.66rem; padding:4px 8px; border-radius:3px; pointer-events:none; z-index:20; white-space:nowrap; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -53,28 +55,28 @@ svg { width:100%; height:auto; display:block; }
     <div class="k"><div class="kl">好友总量</div><div class="kv">17</div></div>
     <div class="k"><div class="kl">进度状态</div><div class="kv" style="font-size:.9rem;padding-top:4px"><span class="badge badge-danger">严重偏低</span></div></div>
     <div class="k"><div class="kl">本月目标</div><div class="kv">200</div></div>
-    <div class="k"><div class="kl">今日通话</div><div class="kv">1 通</div></div>
+    <div class="k"><div class="kl">今日通话</div><div class="kv">7 通</div></div>
     <div class="k"><div class="kl">今日加友</div><div class="kv">+0</div></div>
     <div class="k"><div class="kl">当月二筛</div><div class="kv">0</div></div>
   </div>
   <div class="sec-title">好友总量 · 全量趋势</div>
   <div class="chart-card">
     <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>好友总量</span><span><span class="dot" style="background:var(--ochre)"></span>目标基准线</span></div>
-    <div id="chartFriends"></div>
+    <div class="chart-box"><div id="chartFriends"></div><div class="ctip" id="tipFriends"></div></div>
   </div>
   <div class="sec-title">每日通话量 · 全量</div>
   <div class="chart-card">
     <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>通话数</span></div>
-    <div id="chartCalls"></div>
+    <div class="chart-box"><div id="chartCalls"></div><div class="ctip" id="tipCalls"></div></div>
   </div>
   <div class="sec-title">产能 · 提交二筛与路演</div>
   <div class="chart-card">
     <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>提交二筛（折线）</span><span><span class="dot" style="background:var(--ochre)"></span>路演数（柱）</span></div>
-    <div id="chartCap"></div>
+    <div class="chart-box"><div id="chartCap"></div><div class="ctip" id="tipCap"></div></div>
   </div>
 </div>
 <script>
-var P = {"name": "杨澍", "dept": "事业三部", "deptLink": "dept-3.html", "dates": ["2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20"], "friends": [0, 3, 9, 11, 11, 11, 14, 15, 17, 17], "baseline": [71.0, 77.4, 83.9, 90.3, 96.8, 103.2, 109.7, 116.1, 122.6, 129.0], "calls": [0, 17, 9, 18, 0, 0, 0, 16, 8, 1], "newFriends": [0, 3, 6, 2, 0, 0, 0, 1, 2, 0], "status": "严重偏低", "goal": 200, "totalFriends": 17, "monthErshai": [["2026/07", 0]], "monthRoadshow": [["2026/07", 0]], "curErshai": 0};
+var P = {"name": "杨澍", "dept": "事业三部", "deptLink": "dept-3.html", "dates": ["2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20"], "friends": [0, 3, 9, 11, 11, 11, 14, 15, 17, 17], "baseline": [71.0, 77.4, 83.9, 90.3, 96.8, 103.2, 109.7, 116.1, 122.6, 129.0], "calls": [0, 17, 9, 18, 0, 0, 0, 16, 8, 7], "newFriends": [0, 3, 6, 2, 0, 0, 0, 1, 2, 0], "status": "严重偏低", "goal": 200, "totalFriends": 17, "monthErshai": [["2026/07", 0]], "monthRoadshow": [["2026/07", 0]], "curErshai": 0};
 var W = 0;
 function drawLine(containerId, values, baseline, opts){
   var el = document.getElementById(containerId);
@@ -113,15 +115,37 @@ function drawLine(containerId, values, baseline, opts){
   var lp = '';
   for(var i=0; i<n; i++) lp += (i?' L':'M')+x(i).toFixed(1)+' '+y(values[i]).toFixed(1);
   svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
-  // 数据点
+  // 数据点 + 透明感应区（data-tip/data-idx，事件委托）
   var showDot = n <= 40;
+  var tipId = containerId === 'chartFriends' ? 'tipFriends' : 'tipCalls';
   for(var i=0; i<n; i++){
-    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)">'+
-      '<title>'+P.dates[i]+'：'+values[i]+(baseline?' / 基准 '+baseline[i]:'')+'</title></circle>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"/>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="9" fill="transparent" class="tipdot" data-tip="'+tipId+'" data-idx="'+i+'"/>';
   }
   svg += '</svg>';
   el.innerHTML = svg;
+  el.dataset.series = JSON.stringify({label:P.dates, val:values, base:baseline||[]});
+  el.onmousemove = function(ev){
+    var t = ev.target;
+    if(!t.classList || !t.classList.contains('tipdot')) return;
+    var S = JSON.parse(this.dataset.series);
+    var i = +t.dataset.idx;
+    var txt = S.label[i]+'：'+S.val[i]+(S.base.length?(' / 基准 '+S.base[i]):'');
+    showTip(t.dataset.tip, txt, ev, this);
+  };
+  el.onmouseleave = function(){ hideTips(); };
 }
+
+// 悬浮提示
+function showTip(id, txt, ev, boxEl){
+  var el = document.getElementById(id); if(!el) return;
+  el.innerHTML = txt; el.style.display = 'block';
+  var box = boxEl.getBoundingClientRect();
+  var x = ev.clientX - box.left + 14, y = ev.clientY - box.top - 10;
+  if(x + 130 > box.width) x = ev.clientX - box.left - 130;
+  el.style.left = x+'px'; el.style.top = y+'px';
+}
+function hideTips(){ var els = document.querySelectorAll('.ctip'); for(var i=0;i<els.length;i++) els[i].style.display='none'; }
 function drawCap(){
   var labels = P.monthErshai.map(function(m){ return parseInt(m[0].split('/')[1])+'月'; });
   var ershai = P.monthErshai.map(function(m){ return m[1]; });
@@ -157,7 +181,8 @@ function drawCap(){
     svg += '<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)">'+labels[i]+'</text>';
     if (roadshow[i] != null) {
       var bh = (roadshow[i]/maxV)*ih;
-      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="rgba(157,95,77,.45)" rx="1"><title>'+labels[i]+' 路演 '+roadshow[i]+'</title></rect>';
+      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="rgba(157,95,77,.45)" rx="1"/>';
+      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="transparent" class="tipdot" data-tip="tipCap" data-kind="r" data-idx="'+i+'"/>';
     }
   }
   var lp = '';
@@ -165,10 +190,21 @@ function drawCap(){
   svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
   var showDot = n <= 40;
   for(var i=0; i<n; i++){
-    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"><title>'+labels[i]+' 二筛 '+ershai[i]+'</title></circle>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"/>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="9" fill="transparent" class="tipdot" data-tip="tipCap" data-kind="e" data-idx="'+i+'"/>';
   }
   svg += '</svg>';
   el.innerHTML = svg;
+  el.dataset.cap = JSON.stringify({labels:labels, ershai:ershai, roadshow:roadshow});
+  el.onmousemove = function(ev){
+    var t = ev.target;
+    if(!t.classList || !t.classList.contains('tipdot')) return;
+    var C = JSON.parse(this.dataset.cap);
+    var i = +t.dataset.idx;
+    var txt = t.dataset.kind==='r' ? (C.labels[i]+' 路演 '+C.roadshow[i]) : (C.labels[i]+' 二筛 '+C.ershai[i]);
+    showTip(t.dataset.tip, txt, ev, this);
+  };
+  el.onmouseleave = function(){ hideTips(); };
 }
 function draw(){
   drawLine('chartFriends', P.friends, P.baseline, null);
