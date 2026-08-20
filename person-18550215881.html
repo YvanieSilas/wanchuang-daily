@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朱长风 · 个人档案</title>
+<style>
+:root {
+  --paper: #F5EFE4; --sheet: #FBF7EE; --sand: #E8E6DC;
+  --ink: #2A2622; --ink-light: #4A433C; --ink-muted: #6B6158; --ink-faint: #C9C1B2;
+  --border: #D8CFBE; --accent: #537D96; --accent-deep: #1B365D; --accent-light: rgba(83,125,150,.08);
+  --green: #4A6B4A; --danger: #8B2C1F; --ochre: #9D5F4D; --warm-gray: #8F867B;
+  --radius: 3px;
+  --font-serif: 'Georgia','Noto Serif SC','Songti SC',serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--paper); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
+.page { max-width:880px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { color:var(--accent-deep); }
+.topbar { display:flex; align-items:baseline; gap:10px; margin-bottom:.5rem; flex-wrap:wrap; }
+.back { font-size:.8rem; }
+.p-title { font-family:var(--font-serif); font-size:1.5rem; font-weight:500; }
+.p-dept { font-size:.75rem; color:var(--ink-muted); }
+.rule { border:none; border-top:.5px solid var(--border); margin:.7rem 0 1.2rem; }
+.kpi { display:flex; flex-wrap:wrap; gap:10px 22px; margin-bottom:1.4rem; }
+.kpi .k { min-width:70px; }
+.kpi .kl { font-size:.62rem; color:var(--ink-muted); }
+.kpi .kv { font-family:var(--font-serif); font-size:1.3rem; font-weight:600; color:var(--accent-deep); }
+.kpi .kv.danger { color:var(--danger); }
+.badge { display:inline-block; padding:2px 10px; border-radius:9px; font-size:.68rem; }
+.badge-great { background:rgba(83,125,150,.12); color:var(--accent); }
+.badge-ok { background:rgba(74,107,74,.12); color:var(--green); }
+.badge-warn { background:rgba(157,95,77,.12); color:var(--ochre); }
+.badge-danger { background:rgba(139,44,31,.12); color:var(--danger); }
+.sec-title { font-family:var(--font-serif); font-size:.92rem; font-weight:500; border-left:2px solid var(--accent); padding-left:10px; border-radius:0; margin:0 0 .8rem; }
+.chart-card { background:var(--sheet); border:.5px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:1.4rem; }
+.chart-title { font-size:.72rem; color:var(--ink-muted); margin-bottom:6px; }
+.legend { display:flex; gap:14px; font-size:.66rem; color:var(--ink-muted); margin-bottom:4px; }
+.legend .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+svg { width:100%; height:auto; display:block; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <a class="back" href="dept-2.html">← 返回部门</a>
+    <span class="p-title">朱长风</span>
+    <span class="p-dept">事业二部</span>
+  </div>
+  <hr class="rule">
+  <div class="kpi">
+    <div class="k"><div class="kl">好友总量</div><div class="kv">27</div></div>
+    <div class="k"><div class="kl">进度状态</div><div class="kv" style="font-size:.9rem;padding-top:4px"><span class="badge badge-danger">严重偏低</span></div></div>
+    <div class="k"><div class="kl">本月目标</div><div class="kv">200</div></div>
+    <div class="k"><div class="kl">今日通话</div><div class="kv">0 通</div></div>
+    <div class="k"><div class="kl">今日加友</div><div class="kv">+0</div></div>
+  </div>
+  <div class="sec-title">好友总量 · 全量趋势</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>好友总量</span><span><span class="dot" style="background:var(--ochre)"></span>目标基准线</span></div>
+    <div id="chartFriends"></div>
+  </div>
+  <div class="sec-title">每日通话量 · 全量</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>通话数</span></div>
+    <div id="chartCalls"></div>
+  </div>
+</div>
+<script>
+var P = {p_payload};
+var W = 0;
+function drawLine(containerId, values, baseline, opts){
+  var el = document.getElementById(containerId);
+  W = el.clientWidth || 720;
+  var H = 200, padL = 36, padR = 12, padT = 14, padB = 26;
+  var n = values.length;
+  var maxV = Math.max.apply(null, values.concat(baseline||[]));
+  maxV = Math.max(maxV, 1);
+  var minV = opts && opts.min != null ? opts.min : Math.min.apply(null, values.concat(baseline||[]));
+  minV = Math.min(minV, 0);
+  var range = (maxV - minV) || 1;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var x = function(i){ return padL + (n===1 ? iw/2 : iw * i / (n-1)); };
+  var y = function(v){ return padT + ih * (1 - (v - minV) / range); };
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  // 网格
+  for(var g=0; g<=4; g++){
+    var gy = padT + ih*g/4;
+    var gv = maxV - range*g/4;
+    svg += '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width=".5"/>';
+    svg += '<text x="'+(padL-6)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="var(--ink-muted)">'+Math.round(gv)+'</text>';
+  }
+  // x 轴刻度（自适应密度）
+  var step = Math.ceil(n / Math.max(4, Math.floor(iw/70)));
+  for(var i=0; i<n; i+=step){
+    var lx = x(i);
+    svg += '<text x="'+lx+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)">'+P.dates[i].slice(5)+'</text>';
+  }
+  // 基准线（虚线）
+  if(baseline){
+    var bp = '';
+    for(var b=0; b<baseline.length; b++) bp += (b?' L':'M')+x(b).toFixed(1)+' '+y(baseline[b]).toFixed(1);
+    svg += '<path d="'+bp+'" fill="none" stroke="var(--ochre)" stroke-width="1" stroke-dasharray="5,4"/>';
+  }
+  // 数据线
+  var lp = '';
+  for(var i=0; i<n; i++) lp += (i?' L':'M')+x(i).toFixed(1)+' '+y(values[i]).toFixed(1);
+  svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+  // 数据点
+  var showDot = n <= 40;
+  for(var i=0; i<n; i++){
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)">'+
+      '<title>'+P.dates[i]+'：'+values[i]+(baseline?' / 基准 '+baseline[i]:'')+'</title></circle>';
+  }
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+function draw(){
+  drawLine('chartFriends', P.friends, P.baseline, null);
+  drawLine('chartCalls', P.calls, null, {min:0});
+}
+window.addEventListener('resize', draw);
+draw();
+</script>
+</body>
+</html>
