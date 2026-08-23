@@ -80,6 +80,7 @@ a:hover { color:var(--accent-deep); }
     <a class="back" href="index.html">← 返回总览</a>
     <span class="dept-title">事业三部</span>
     <span class="dateline" id="dateline"></span>
+    <span id="themeToggle" style="cursor:pointer;font-size:.78rem;margin-left:auto" title="切换浅色/深色主题">◐</span>
   </div>
   <hr class="rule">
   <div class="month-strip" id="monthStrip"></div>
@@ -208,6 +209,18 @@ document.onkeydown = function(e){
 };
 
 render(DATES[cur]);
+
+// 主题切换（与首页共用同一 storage key）
+(function(){
+  var btn = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('daily-report-theme');
+  if (saved === 'dark') { document.documentElement.classList.add('theme-dark'); btn.textContent = '◑'; }
+  btn.onclick = function(){
+    var isDark = document.documentElement.classList.toggle('theme-dark');
+    btn.textContent = isDark ? '◑' : '◐';
+    localStorage.setItem('daily-report-theme', isDark ? 'dark' : 'light');
+  };
+})();
 </script>
 </body>
 </html>
