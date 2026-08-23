@@ -19,6 +19,12 @@
   --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff; --accent-light: rgba(88,166,255,.1);
   --green: #3fb950; --danger: #f85149; --ochre: #d29922; --warm-gray: #6e7681;
 }
+:root.theme-green {
+  --paper: #EEF2E9; --sheet: #F6F9F2; --sand: #E2E8DB;
+  --ink: #283326; --ink-light: #44503F; --ink-muted: #6C7765; --ink-faint: #B9C3B0;
+  --border: #C9D4BF; --accent: #4F7A4F; --accent-deep: #345534; --accent-light: rgba(79,122,79,.1);
+  --green: #4F7A4F; --danger: #8B2C1F; --ochre: #9D6B4D; --warm-gray: #8A8578;
+}
 * { box-sizing:border-box; margin:0; padding:0; }
 body { background:var(--paper); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
 .page { max-width:880px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
@@ -221,15 +227,22 @@ function draw(){
 window.addEventListener('resize', draw);
 draw();
 
-// 主题切换（与首页共用同一 storage key）
+// 主题切换（浅色 → 深色 → 绿色 循环，与首页共用 storage）
 (function(){
   var btn = document.getElementById('themeToggle');
-  var saved = localStorage.getItem('daily-report-theme');
-  if (saved === 'dark') { document.documentElement.classList.add('theme-dark'); btn.textContent = '◑'; }
+  var saved = localStorage.getItem('daily-report-theme') || 'light';
+  function apply(t){
+    document.documentElement.classList.remove('theme-dark','theme-green');
+    if(t==='dark') document.documentElement.classList.add('theme-dark');
+    if(t==='green') document.documentElement.classList.add('theme-green');
+    btn.textContent = t==='light' ? '◐' : (t==='dark' ? '◑' : '◈');
+    localStorage.setItem('daily-report-theme', t);
+  }
+  apply(saved);
   btn.onclick = function(){
-    var isDark = document.documentElement.classList.toggle('theme-dark');
-    btn.textContent = isDark ? '◑' : '◐';
-    localStorage.setItem('daily-report-theme', isDark ? 'dark' : 'light');
+    var cur = localStorage.getItem('daily-report-theme') || 'light';
+    var next = cur==='light' ? 'dark' : (cur==='dark' ? 'green' : 'light');
+    apply(next);
   };
 })();
 </script>
