@@ -13,6 +13,12 @@
   --radius: 3px;
   --font-serif: 'Georgia','Noto Serif SC','Songti SC',serif;
 }
+:root.theme-dark {
+  --paper: #0f1419; --sheet: #161b22; --sand: #1c2128;
+  --ink: #c9d1d9; --ink-light: #8b949e; --ink-muted: #6e7681; --ink-faint: #484f58;
+  --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff; --accent-light: rgba(88,166,255,.1);
+  --green: #3fb950; --danger: #f85149; --ochre: #d29922; --warm-gray: #6e7681;
+}
 * { box-sizing:border-box; margin:0; padding:0; }
 body { background:var(--paper); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
 .page { max-width:880px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
@@ -49,6 +55,7 @@ svg { width:100%; height:auto; display:block; }
     <a class="back" href="dept-2.html">← 返回部门</a>
     <span class="p-title">朱长风</span>
     <span class="p-dept">事业二部</span>
+    <span id="themeToggle" style="cursor:pointer;font-size:.78rem;margin-left:auto" title="切换浅色/深色主题">◐</span>
   </div>
   <hr class="rule">
   <div class="kpi">
@@ -213,6 +220,18 @@ function draw(){
 }
 window.addEventListener('resize', draw);
 draw();
+
+// 主题切换（与首页共用同一 storage key）
+(function(){
+  var btn = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('daily-report-theme');
+  if (saved === 'dark') { document.documentElement.classList.add('theme-dark'); btn.textContent = '◑'; }
+  btn.onclick = function(){
+    var isDark = document.documentElement.classList.toggle('theme-dark');
+    btn.textContent = isDark ? '◑' : '◐';
+    localStorage.setItem('daily-report-theme', isDark ? 'dark' : 'light');
+  };
+})();
 </script>
 </body>
 </html>
