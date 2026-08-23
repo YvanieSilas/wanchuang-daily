@@ -70,9 +70,11 @@ a:hover { color:var(--accent-deep); }
 .proj-meta { font-size:.66rem; color:var(--ink-muted); }
 .proj-summary { font-size:.72rem; color:var(--ink-light); line-height:1.6; }
 .trend { display:flex; align-items:flex-end; gap:8px; height:80px; padding:12px 14px; border:.5px solid var(--border); border-radius:var(--radius); background:var(--sheet); }
-.trend .bar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+.trend .bar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; position:relative; }
 .trend .bar .fill { width:72%; background:var(--accent); border-radius:1px 1px 0 0; opacity:.9; }
 .trend .bar .lbl { font-size:.58rem; color:var(--ink-muted); margin-top:3px; }
+.trend .bar .bt-tip { display:none; position:absolute; bottom:105%; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; font-size:.62rem; padding:3px 7px; border-radius:3px; white-space:nowrap; z-index:10; pointer-events:none; }
+.trend .bar:hover .bt-tip { display:block; }
 @media(max-width:700px){
   .ov-grid { grid-template-columns:repeat(3,1fr); }
   .m-hdr,.m-row { grid-template-columns:1.2fr .5fr .5fr .7fr .7fr; }
@@ -175,7 +177,7 @@ function render(dateKey){
     var dd = DATA[k];
     var v = dd? dd.totalCallCount : 0;
     var isSel = k===dateKey;
-    trend += '<div class="bar"><div class="fill" style="height:'+Math.max(4,Math.min(100,v/3))+'%'+(isSel?'':' ;opacity:.35')+'"></div><span class="lbl">'+(k?k.slice(5):'')+'</span></div>';
+    trend += '<div class="bar"><div class="bt-tip">'+(k||'')+'：'+v+' 通</div><div class="fill" style="height:'+Math.max(4,Math.min(100,v/3))+'%'+(isSel?'':' ;opacity:.35')+'"></div><span class="lbl">'+(k?k.slice(5):'')+'</span></div>';
   }
   document.getElementById('trendBox').innerHTML = trend;
 
