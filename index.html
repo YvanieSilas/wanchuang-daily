@@ -107,6 +107,7 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 .dept-link:hover { opacity:1; color:var(--accent-deep); }
 .dept-item.expanded .chevron { transform:rotate(90deg); }
 .dept-detail { max-height:0; overflow:hidden; transition:max-height .35s; }
+.cell-clamp { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .theme-dark .dept-detail { background:#111820; }
 .dept-item.expanded .dept-detail { max-height:800px; }
 .m-row { display:grid; grid-template-columns:1.6fr 1fr 1fr; padding:7px 12px; font-size:.78rem; border-top:.5px solid rgba(0,0,0,.04); background:rgba(83,125,150,.02); align-items:center; }
@@ -461,13 +462,13 @@ function render(dateKey) {
       pms.forEach(function(p){ if(p.highCount>0) { deptHigh += p.highCount; progressProj++; } deptNone += (p.noneCount||0); deptUnclear += (p.unclearCount||0); });
       var hm = pms.length > 0;
       projHTML += '<div class="dept-item'+(hm?'':' no-members')+'">'+
-        '<div class="dept-main" style="grid-template-columns:2fr .6fr .6fr .6fr .6fr 2.6fr">'+
+        '<div class="dept-main" style="grid-template-columns:1.6fr .5fr .5fr .5fr .5fr 3.2fr">'+
           '<div class="dept-name"><span class="chevron">▶</span>'+dp.dept+deptLink(dp.dept)+'</div>'+
           '<div style="font-size:.78rem">'+pms.length+' 个</div>'+
           '<div style="font-size:.78rem;font-weight:500;color:var(--accent)">'+deptHigh+'</div>'+
           '<div style="font-size:.78rem">'+deptNone+'</div>'+
           '<div style="font-size:.78rem;color:var(--ink-muted)">'+deptUnclear+'</div>'+
-          '<div style="color:var(--ink-muted);font-size:.68rem">点击展开查看详情</div>'+
+          '<div style="color:var(--ink-muted);font-size:.68rem;text-align:left">点击展开查看详情</div>'+
         '</div>';
       if (hm) {
         projHTML += '<div class="dept-detail">';
@@ -479,14 +480,14 @@ function render(dateKey) {
           var conMatch = s.match(/顾虑[：:]([\s\S]*)/);
           if (recMatch && recMatch[1].trim()) rec = recMatch[1].trim();
           if (conMatch && conMatch[1].trim()) con = conMatch[1].trim();
-          projHTML += '<div class="m-row" style="grid-template-columns:1.6fr .5fr .5fr .5fr .5fr 1.6fr 1.6fr">'+
+          projHTML += '<div class="m-row" style="grid-template-columns:1.6fr .5fr .5fr .5fr .5fr 1.6fr 1.6fr;align-items:start">'+
             '<div class="member-name" style="padding-left:12px">'+p.name+'</div>'+
             '<div>'+p.pushCount+'</div>'+
             '<div>'+ (p.highCount || 0) +'</div>'+
             '<div>'+ (p.noneCount || 0) +'</div>'+
             '<div>'+ (p.unclearCount || 0) +'</div>'+
-            '<div style="font-size:.68rem;color:var(--ink-light)">'+rec+'</div>'+
-            '<div style="font-size:.68rem;color:var(--ink-light)">'+con+'</div>'+
+            '<div class="cell-clamp" style="font-size:.68rem;color:var(--ink-light);line-height:1.5" title="'+rec.replace(/"/g,'&quot;')+'">'+rec+'</div>'+
+            '<div class="cell-clamp" style="font-size:.68rem;color:var(--ink-light);line-height:1.5" title="'+con.replace(/"/g,'&quot;')+'">'+con+'</div>'+
             '</div>';
         });
         projHTML += '</div>';
