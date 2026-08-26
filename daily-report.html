@@ -239,7 +239,7 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 
 <div class="section-title">部门项目跟进</div>
 <div class="dept-list" id="deptProj">
-  <div class="dept-hdr" style="grid-template-columns:2fr .6fr .6fr .6fr .6fr 2.6fr"><span>在推项目</span><span>推荐数</span><span>高意向</span><span>无意向</span><span>未明确</span><span>项目概述</span></div>
+  <div class="dept-hdr" style="grid-template-columns:1.6fr .5fr .5fr .5fr .5fr 1.6fr 1.6fr"><span>在推项目</span><span>推荐数</span><span>高意向</span><span>无意向</span><span>未明确</span><span>认可</span><span>顾虑</span></div>
   <div id="deptProjItems"></div>
 </div>
 
@@ -472,13 +472,21 @@ function render(dateKey) {
       if (hm) {
         projHTML += '<div class="dept-detail">';
         pms.forEach(function(p){
-          projHTML += '<div class="m-row" style="grid-template-columns:2fr .6fr .6fr .6fr .6fr 2.6fr">'+
+          // 拆分认可/顾虑
+          var rec = '无', con = '无';
+          var s = p.summary || '';
+          var recMatch = s.match(/认可[：:]([\s\S]*?)(?=<br>顾虑|$)/);
+          var conMatch = s.match(/顾虑[：:]([\s\S]*)/);
+          if (recMatch && recMatch[1].trim()) rec = recMatch[1].trim();
+          if (conMatch && conMatch[1].trim()) con = conMatch[1].trim();
+          projHTML += '<div class="m-row" style="grid-template-columns:1.6fr .5fr .5fr .5fr .5fr 1.6fr 1.6fr">'+
             '<div class="member-name" style="padding-left:12px">'+p.name+'</div>'+
             '<div>'+p.pushCount+'</div>'+
             '<div>'+ (p.highCount || 0) +'</div>'+
             '<div>'+ (p.noneCount || 0) +'</div>'+
             '<div>'+ (p.unclearCount || 0) +'</div>'+
-            '<div style="font-size:.68rem;color:var(--ink-muted)">'+p.summary+'</div>'+
+            '<div style="font-size:.68rem;color:var(--ink-light)">'+rec+'</div>'+
+            '<div style="font-size:.68rem;color:var(--ink-light)">'+con+'</div>'+
             '</div>';
         });
         projHTML += '</div>';
