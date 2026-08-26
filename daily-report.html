@@ -220,15 +220,9 @@ body { background:var(--paper); color:var(--ink); font-family:var(--font-sans); 
 <div class="banner" id="banner"></div>
 
 <div class="section-title">电话 & 微信通话 · 部门对比</div>
-<div class="half-row">
-<div class="dept-list half-col">
-  <div class="dept-hdr"><span>部门</span><span>拨通人数</span><span>总通话时长</span></div>
-  <div id="deptItems"></div>
-</div>
-<div class="dept-list half-col">
-  <div class="dept-hdr"><span>部门</span><span>拨通人数</span><span>总通话时长</span></div>
-  <div id="wechatCallItems"></div>
-</div>
+<div class="dept-list">
+  <div class="dept-hdr" style="grid-template-columns:1.4fr 1fr 1fr 1fr 1fr"><span>部门</span><span>电话拨通</span><span>电话通时</span><span>微信拨通</span><span>微信通时</span></div>
+  <div id="callCombined"></div>
 </div>
 
 <div class="section-title">今日微信新增好友</div>
@@ -393,48 +387,41 @@ function render(dateKey) {
   bn += '</div></div>';
   document.getElementById('banner').innerHTML = bn;
 
-  // Phone depts
-  var dh = '';
+  // 电话 & 微信通话 合并表
+  var combined = '';
+  var wcData = d.wechatCallDepts || [];
   d.departments.forEach(function(dd,di){
-    var hm = dd.members && dd.members.length>0;
-    dh += '<div class="dept-item'+(hm?'':' no-members')+'" data-dept="'+di+'">'+
-      '<div class="dept-main">'+
+    var wd = wcData[di] || {};
+    var hm = (dd.members && dd.members.length>0) || (wd.members && wd.members.length>0);
+    combined += '<div class="dept-item'+(hm?'':' no-members')+'">'+
+      '<div class="dept-main" style="grid-template-columns:1.4fr 1fr 1fr 1fr 1fr">'+
         '<div class="dept-name">'+(hm?'<span class="chevron">▶</span>':'<span style="width:12px;display:inline-block"></span>')+dd.name+deptLink(dd.name)+'</div>'+
         '<div>'+fmtVal(dd.callCount,' / '+dd.totalMembers)+'</div>'+
         '<div>'+fmtVal(dd.avgDuration,' min')+'</div>'+
-      '</div>';
-    if(hm) {
-      dh += '<div class="dept-detail">';
-      dd.members.forEach(function(m){
-        dh += '<div class="m-row"><div class="m-name">'+m.name+'</div><div>'+m.calls+'</div><div>'+m.duration+' min</div></div>';
-      });
-      dh += '</div>';
-    }
-    dh += '</div>';
-  });
-  document.getElementById('deptItems').innerHTML = dh;
-
-  // 微信语音通话模块
-  var wcHTML = '';
-  var wcData = d.wechatCallDepts || [];
-  wcData.forEach(function(wd){
-    var hm = wd.members && wd.members.length > 0;
-    wcHTML += '<div class="dept-item'+(hm?'':' no-members')+'">'+
-      '<div class="dept-main" style="grid-template-columns:1.6fr 1fr 1fr">'+
-        '<div class="dept-name">'+(hm?'<span class="chevron">▶</span>':'<span style="width:12px;display:inline-block"></span>')+wd.name+deptLink(wd.name)+'</div>'+
         '<div>'+fmtVal(wd.callCount,' / '+wd.totalMembers)+'</div>'+
         '<div>'+fmtVal(wd.avgDuration,' min')+'</div>'+
       '</div>';
-    if(hm){
-      wcHTML += '<div class="dept-detail">';
-      wd.members.forEach(function(m){
-        wcHTML += '<div class="m-row" style="grid-template-columns:1.6fr 1fr 1fr"><div class="m-name">'+m.name+'</div><div>'+m.calls+'</div><div>'+m.duration+' min</div></div>';
-      });
-      wcHTML += '</div>';
+    if(hm) {
+      combined += '<div class="dept-detail">';
+      // 成员行：电话列 + 微信列
+      var pm = dd.members || [], wm = wd.members || [];
+      var maxLen = Math.max(pm.length, wm.length);
+      for(var i=0;i<maxLen;i++){
+        var pmm = pm[i] || {};
+        var wmm = wm[i] || {};
+        combined += '<div class="m-row" style="grid-template-columns:1.4fr 1fr 1fr 1fr 1fr">'+
+          '<div class="m-name">'+ (pmm.name||wmm.name||'') +'</div>'+
+          '<div>'+ (pmm.calls||0) +'</div>'+
+          '<div>'+ (pmm.duration||0) +' min</div>'+
+          '<div>'+ (wmm.calls||0) +'</div>'+
+          '<div>'+ (wmm.duration||0) +' min</div>'+
+        '</div>';
+      }
+      combined += '</div>';
     }
-    wcHTML += '</div>';
+    combined += '</div>';
   });
-  document.getElementById('wechatCallItems').innerHTML = wcHTML;
+  document.getElementById('callCombined').innerHTML = combined;
 
   // WeChat new friends strip
   var wn = '', wds = d.wechatDepts||[];
