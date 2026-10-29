@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刘钰轩 · 个人档案</title>
+<style>
+:root {
+  --paper: #F5EFE4; --sheet: #FBF7EE; --sand: #E8E6DC;
+  --ink: #2A2622; --ink-light: #4A433C; --ink-muted: #6B6158; --ink-faint: #C9C1B2;
+  --border: #D8CFBE; --accent: #537D96; --accent-deep: #1B365D; --accent-light: rgba(83,125,150,.08);
+  --green: #4A6B4A; --danger: #8B2C1F; --ochre: #9D5F4D; --warm-gray: #8F867B;
+  --radius: 3px;
+  --font-serif: 'Georgia','Noto Serif SC','Songti SC',serif;
+}
+:root.theme-dark {
+  --paper: #0f1419; --sheet: #161b22; --sand: #1c2128;
+  --ink: #c9d1d9; --ink-light: #8b949e; --ink-muted: #6e7681; --ink-faint: #484f58;
+  --border: #30363d; --accent: #58a6ff; --accent-deep: #79c0ff; --accent-light: rgba(88,166,255,.1);
+  --green: #3fb950; --danger: #f85149; --ochre: #d29922; --warm-gray: #6e7681;
+}
+:root.theme-green {
+  --paper: #F5F1E8; --sheet: #FBF9F2; --sand: #EAE5D9;
+  --ink: #2A2A24; --ink-light: #4A4A42; --ink-muted: #6E6E64; --ink-faint: #C6C4B8;
+  --border: #DAD5C8; --accent: #4F7A4F; --accent-deep: #345534; --accent-light: rgba(79,122,79,.1);
+  --green: #4F7A4F; --danger: #8B2C1F; --ochre: #9D6B4D; --warm-gray: #8A8578;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--paper); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
+.page { max-width:880px; margin:0 auto; padding:1.6rem 1.2rem 3rem; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { color:var(--accent-deep); }
+.topbar { display:flex; align-items:baseline; gap:10px; margin-bottom:.5rem; flex-wrap:wrap; }
+.back { font-size:.8rem; }
+.p-title { font-family:var(--font-serif); font-size:1.5rem; font-weight:500; }
+.p-dept { font-size:.75rem; color:var(--ink-muted); }
+.rule { border:none; border-top:.5px solid var(--border); margin:.7rem 0 1.2rem; }
+.kpi { display:flex; flex-wrap:wrap; gap:10px 22px; margin-bottom:1.4rem; }
+.kpi .k { min-width:70px; }
+.kpi .kl { font-size:.62rem; color:var(--ink-muted); }
+.kpi .kv { font-family:var(--font-serif); font-size:1.3rem; font-weight:600; color:var(--accent-deep); }
+.kpi .kv.danger { color:var(--danger); }
+.badge { display:inline-block; padding:2px 10px; border-radius:9px; font-size:.68rem; }
+.badge-great { background:rgba(83,125,150,.12); color:var(--accent); }
+.badge-ok { background:rgba(74,107,74,.12); color:var(--green); }
+.badge-warn { background:rgba(157,95,77,.12); color:var(--ochre); }
+.badge-danger { background:rgba(139,44,31,.12); color:var(--danger); }
+.sec-title { font-family:var(--font-serif); font-size:.92rem; font-weight:500; border-left:2px solid var(--accent); padding-left:10px; border-radius:0; margin:0 0 .8rem; }
+.chart-card { background:var(--sheet); border:.5px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:1.4rem; }
+.chart-title { font-size:.72rem; color:var(--ink-muted); margin-bottom:6px; }
+.legend { display:flex; gap:14px; font-size:.66rem; color:var(--ink-muted); margin-bottom:4px; }
+.legend .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+svg { width:100%; height:auto; display:block; }
+.chart-box { position:relative; }
+.ctip { position:absolute; display:none; background:var(--ink); color:#fff; font-size:.66rem; padding:4px 8px; border-radius:3px; pointer-events:none; z-index:20; white-space:nowrap; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <a class="back" href="dept-2.html">← 返回部门</a>
+    <span class="p-title">刘钰轩</span>
+    <span class="p-dept">事业二部</span>
+    <span id="themeToggle" style="cursor:pointer;font-size:.78rem;margin-left:auto" title="切换浅色/深色主题">◐</span>
+  </div>
+  <hr class="rule">
+  <div class="kpi">
+    <div class="k"><div class="kl">推荐量</div><div class="kv">366 通</div></div>
+    <div class="k"><div class="kl">有效沟通量</div><div class="kv">0 通</div></div>
+    <div class="k"><div class="kl">高意向数</div><div class="kv">12</div></div>
+    <div class="k"><div class="kl">三分钟以上通话</div><div class="kv">51 通</div></div>
+    <div class="k"><div class="kl">总通话时长</div><div class="kv">11 时 58 分</div></div>
+  </div>
+  <div class="sec-title">好友总量 · 全量趋势</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>好友总量</span><span><span class="dot" style="background:var(--ochre)"></span>目标基准线</span></div>
+    <div class="chart-box"><div id="chartFriends"></div><div class="ctip" id="tipFriends"></div></div>
+  </div>
+  <div class="sec-title">每日通话量 · 全量</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>通话数</span></div>
+    <div class="chart-box"><div id="chartCalls"></div><div class="ctip" id="tipCalls"></div></div>
+  </div>
+  <div class="sec-title">产能 · 提交二筛与路演</div>
+  <div class="chart-card">
+    <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>提交二筛（折线）</span><span><span class="dot" style="background:var(--ochre)"></span>路演数（柱）</span></div>
+    <div class="chart-box"><div id="chartCap"></div><div class="ctip" id="tipCap"></div></div>
+  </div>
+</div>
+<script>
+var P = {"name": "刘钰轩", "dept": "事业二部", "deptLink": "dept-2.html", "dates": ["2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-22", "2026-08-23", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-30", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-06", "2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-13", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17", "2026-09-18", "2026-09-19", "2026-09-20", "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-27", "2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09", "2026-10-10", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29"], "friends": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 13, 13, 13, 21, 24, 26, 26, 26, 26, 26, 26, 27, 27, 30, 30, 30, 30, 32, 32, 32, 32, 32, 35, 35, 46, 54, 60, 60, 71, 84, 90, 99, 109, 109, 109, 116, 127, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 159, 168, 179, 179, 191, 202, 219, 232, 241, 241, 241, 254, 255, 265, 281, 292, 292, 292, 307, 331, 338, 341], "baseline": [200.0, 19.4, 25.8, 32.3, 38.7, 45.2, 58.1, 64.5, 71.0, 77.4, 83.9, 90.3, 96.8, 103.2, 109.7, 116.1, 122.6, 129.0, 135.5, 141.9, 148.4, 154.8, 161.3, 167.7, 174.2, 180.6, 193.5, 200.0, 206.7, 213.3, 220.0, 226.7, 240.0, 246.7, 253.3, 260.0, 266.7, 273.3, 286.7, 293.3, 300.0, 306.7, 313.3, 320.0, 326.7, 333.3, 340.0, 346.7, 353.3, 360.0, 366.7, 373.3, 380.0, 386.7, 393.3, 400.0, 406.5, 412.9, 419.4, 425.8, 432.3, 438.7, 445.2, 451.6, 458.1, 464.5, 471.0, 477.4, 483.9, 490.3, 496.8, 503.2, 509.7, 516.1, 522.6, 529.0, 535.5, 541.9, 548.4, 554.8, 561.3, 567.7, 574.2, 580.6, 587.1], "calls": [0, 0, 0, 23, 14, 1, 0, 4, 0, 0, 8, 7, 0, 0, 4, 5, 6, 0, 0, 0, 0, 0, 5, 3, 8, 7, 0, 0, 3, 12, 0, 2, 0, 16, 10, 3, 4, 1, 0, 4, 3, 3, 8, 4, 2, 5, 3, 3, 8, 5, 0, 0, 0, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5, 4, 4, 0, 7, 5, 6, 2, 5, 0, 0, 5, 1, 6, 4, 3, 0, 0, 4, 7, 0, 1], "newFriends": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 8, 3, 2, 0, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 11, 8, 6, 0, 11, 13, 6, 9, 10, 0, 0, 7, 11, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 9, 11, 0, 12, 11, 17, 13, 9, 0, 0, 13, 1, 10, 16, 11, 0, 0, 15, 24, 7, 3], "status": "严重偏低", "goal": 600, "totalFriends": 341, "monthErshai": [["2026/04", 12], ["2026/05", 21], ["2026/06", 48], ["2026/07", 38], ["2026/08", 37], ["2026/09", 40]], "monthRoadshow": [["2026/04", 1], ["2026/05", 3], ["2026/06", 7], ["2026/07", 11], ["2026/08", 6], ["2026/09", 11]], "curErshai": 43};
+var W = 0;
+function drawLine(containerId, values, baseline, opts){
+  var el = document.getElementById(containerId);
+  W = el.clientWidth || 720;
+  var H = 200, padL = 36, padR = 12, padT = 14, padB = 26;
+  var n = values.length;
+  var maxV = Math.max.apply(null, values.concat(baseline||[]));
+  maxV = Math.max(maxV, 1);
+  var minV = opts && opts.min != null ? opts.min : Math.min.apply(null, values.concat(baseline||[]));
+  minV = Math.min(minV, 0);
+  var range = (maxV - minV) || 1;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var x = function(i){ return padL + (n===1 ? iw/2 : iw * i / (n-1)); };
+  var y = function(v){ return padT + ih * (1 - (v - minV) / range); };
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  // 网格
+  for(var g=0; g<=4; g++){
+    var gy = padT + ih*g/4;
+    var gv = maxV - range*g/4;
+    svg += '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width=".5"/>';
+    svg += '<text x="'+(padL-6)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="var(--ink-muted)">'+Math.round(gv)+'</text>';
+  }
+  // x 轴刻度（自适应密度）
+  var step = Math.ceil(n / Math.max(4, Math.floor(iw/70)));
+  for(var i=0; i<n; i+=step){
+    var lx = x(i);
+    svg += '<text x="'+lx+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)">'+P.dates[i].slice(5)+'</text>';
+  }
+  // 基准线（虚线）
+  if(baseline){
+    var bp = '';
+    for(var b=0; b<baseline.length; b++) bp += (b?' L':'M')+x(b).toFixed(1)+' '+y(baseline[b]).toFixed(1);
+    svg += '<path d="'+bp+'" fill="none" stroke="var(--ochre)" stroke-width="1" stroke-dasharray="5,4"/>';
+  }
+  // 数据线
+  var lp = '';
+  for(var i=0; i<n; i++) lp += (i?' L':'M')+x(i).toFixed(1)+' '+y(values[i]).toFixed(1);
+  svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+  // 数据点 + 透明感应区（data-tip/data-idx，事件委托）
+  var showDot = n <= 40;
+  var tipId = containerId === 'chartFriends' ? 'tipFriends' : 'tipCalls';
+  for(var i=0; i<n; i++){
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"/>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(values[i]).toFixed(1)+'" r="9" fill="transparent" class="tipdot" data-tip="'+tipId+'" data-idx="'+i+'"/>';
+  }
+  svg += '</svg>';
+  el.innerHTML = svg;
+  el.dataset.series = JSON.stringify({label:P.dates, val:values, base:baseline||[]});
+  el.onmousemove = function(ev){
+    var t = ev.target;
+    if(!t.classList || !t.classList.contains('tipdot')) return;
+    var S = JSON.parse(this.dataset.series);
+    var i = +t.dataset.idx;
+    var txt = S.label[i]+'：'+S.val[i]+(S.base.length?(' / 基准 '+S.base[i]):'');
+    showTip(t.dataset.tip, txt, ev, this);
+  };
+  el.onmouseleave = function(){ hideTips(); };
+}
+
+// 悬浮提示
+function showTip(id, txt, ev, boxEl){
+  var el = document.getElementById(id); if(!el) return;
+  el.innerHTML = txt; el.style.display = 'block';
+  var box = boxEl.getBoundingClientRect();
+  var x = ev.clientX - box.left + 14, y = ev.clientY - box.top - 10;
+  if(x + 130 > box.width) x = ev.clientX - box.left - 130;
+  el.style.left = x+'px'; el.style.top = y+'px';
+}
+function hideTips(){ var els = document.querySelectorAll('.ctip'); for(var i=0;i<els.length;i++) els[i].style.display='none'; }
+function drawCap(){
+  var labels = P.monthErshai.map(function(m){ return parseInt(m[0].split('/')[1])+'月'; });
+  var ershai = P.monthErshai.map(function(m){ return m[1]; });
+  var roadshow = P.monthRoadshow.map(function(m){ return m[1]; });
+  // 当月二筛追加到折线（当前月 + 1）
+  if (P.curErshai !== undefined && P.curErshai !== null) {
+    var now = new Date();
+    var curLabel = (now.getMonth()+1)+'月';
+    var lastLabel = labels.length ? labels[labels.length-1] : '';
+    if (!lastLabel || (lastLabel !== curLabel)) {
+      labels.push(curLabel); ershai.push(P.curErshai); roadshow.push(null);
+    }
+  }
+  if (!labels.length) { document.getElementById('chartCap').innerHTML = '<div style="color:var(--ink-muted);font-size:.75rem">暂无产能数据</div>'; return; }
+  var el = document.getElementById('chartCap');
+  var W = el.clientWidth || 720, H = 200, padL = 36, padR = 12, padT = 14, padB = 26;
+  var n = labels.length;
+  var maxV = 1;
+  ershai.forEach(function(v){ if(v>maxV) maxV=v; });
+  roadshow.forEach(function(v){ if(v!=null && v>maxV) maxV=v; });
+  var minV = 0, range = maxV - minV || 1;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var x = function(i){ return padL + (n===1 ? iw/2 : iw*i/(n-1)); };
+  var y = function(v){ return padT + ih * (1 - (v - minV) / range); };
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  for(var g=0; g<=4; g++){
+    var gy = padT + ih*g/4, gv = maxV - range*g/4;
+    svg += '<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--border)" stroke-width=".5"/>';
+    svg += '<text x="'+(padL-6)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="var(--ink-muted)">'+Math.round(gv)+'</text>';
+  }
+  var bw = Math.min(22, iw/n*0.4);
+  for(var i=0; i<n; i++){
+    svg += '<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--ink-muted)">'+labels[i]+'</text>';
+    if (roadshow[i] != null) {
+      var bh = (roadshow[i]/maxV)*ih;
+      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="rgba(157,95,77,.45)" rx="1"/>';
+      svg += '<rect x="'+(x(i)-bw/2)+'" y="'+(padT+ih-bh)+'" width="'+bw+'" height="'+bh+'" fill="transparent" class="tipdot" data-tip="tipCap" data-kind="r" data-idx="'+i+'"/>';
+    }
+  }
+  var lp = '';
+  for(var i=0; i<n; i++) lp += (i?' L':'M')+x(i).toFixed(1)+' '+y(ershai[i]).toFixed(1);
+  svg += '<path d="'+lp+'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+  var showDot = n <= 40;
+  for(var i=0; i<n; i++){
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="'+(showDot?2.2:1.2)+'" fill="var(--accent)"/>';
+    svg += '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(ershai[i]).toFixed(1)+'" r="9" fill="transparent" class="tipdot" data-tip="tipCap" data-kind="e" data-idx="'+i+'"/>';
+  }
+  svg += '</svg>';
+  el.innerHTML = svg;
+  el.dataset.cap = JSON.stringify({labels:labels, ershai:ershai, roadshow:roadshow});
+  el.onmousemove = function(ev){
+    var t = ev.target;
+    if(!t.classList || !t.classList.contains('tipdot')) return;
+    var C = JSON.parse(this.dataset.cap);
+    var i = +t.dataset.idx;
+    var txt = t.dataset.kind==='r' ? (C.labels[i]+' 路演 '+C.roadshow[i]) : (C.labels[i]+' 二筛 '+C.ershai[i]);
+    showTip(t.dataset.tip, txt, ev, this);
+  };
+  el.onmouseleave = function(){ hideTips(); };
+}
+function draw(){
+  drawLine('chartFriends', P.friends, P.baseline, null);
+  drawLine('chartCalls', P.calls, null, {min:0});
+  drawCap();
+}
+window.addEventListener('resize', draw);
+draw();
+
+// 主题切换（浅色 → 深色 → 绿色 循环，与首页共用 storage）
+(function(){
+  var btn = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('daily-report-theme') || 'light';
+  function apply(t){
+    document.documentElement.classList.remove('theme-dark','theme-green');
+    if(t==='dark') document.documentElement.classList.add('theme-dark');
+    if(t==='green') document.documentElement.classList.add('theme-green');
+    btn.textContent = t==='light' ? '◐' : (t==='dark' ? '◑' : '◈');
+    localStorage.setItem('daily-report-theme', t);
+  }
+  apply(saved);
+  btn.onclick = function(){
+    var cur = localStorage.getItem('daily-report-theme') || 'light';
+    var next = cur==='light' ? 'dark' : (cur==='dark' ? 'green' : 'light');
+    apply(next);
+  };
+})();
+</script>
+</body>
+</html>
